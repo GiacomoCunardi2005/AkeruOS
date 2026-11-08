@@ -1,0 +1,7 @@
+firmware/*
+!firmware/.gitkeep
+output/*
+!output/.gitkeep
+unpacked/
+*.exe
+*.dmg
