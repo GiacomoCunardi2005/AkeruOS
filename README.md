@@ -22,12 +22,18 @@ A hardware test left the research camera unbootable; read the
 | [`MDs/`](MDs/) | Original research reports, kept under their workspace paths; this collection is incomplete |
 | [`Python_Trace_Scripts/`](Python_Trace_Scripts/) | Original analysis and verification scripts; some dependencies and inputs are not included |
 | [`coolpix-s33-re/`](coolpix-s33-re/) | Firmware container parser and synthetic tests, with their original MIT licence |
-| `ui/` | AkeruOS menu model (four flexible buttons), labels, mono scanline renderer |
-| `camera/` | Colour/mono selection, Mono RAW row processing, iris action adapter |
-| `nikon_v11_runtime.*` | Thin ABI wrappers around V1.1 services (task creation, delay, critical sections) |
-| `nikon_v11_sd_*`, `nikon_v11_memdump_*`, `ram_dump*` | RAM-dump prototypes that write through Nikon's SD/diagnostic services. One variant produced a real RAM dump on the camera |
-| `usb_ram*` | Prototype RAM transfer over the USB stack (offline only) |
-| `tests/` | Host unit tests and fixtures |
+| [`ui/`](ui/) | AkeruOS menu model (four flexible buttons), labels, mono scanline renderer |
+| [`camera/`](camera/) | Colour/mono selection, Mono RAW row processing, iris action adapter |
+| [`tests/`](tests/) | Host unit tests and fixtures |
+| [`S33-sections/analysis_codex/static_common.py`](S33-sections/analysis_codex/static_common.py) | Static-analysis helper; its firmware inputs and other dependencies are not all included |
+| [`nikon_v11_runtime.c`](nikon_v11_runtime.c), [`nikon_v11_runtime.h`](nikon_v11_runtime.h) | Thin ABI wrappers around V1.1 services (task creation, delay, critical sections) |
+| [`ram_dump.c`](ram_dump.c), [`nikon_v11_sd_io.c`](nikon_v11_sd_io.c), [`nikon_v11_memdump_worker.c`](nikon_v11_memdump_worker.c) | Examples of RAM-dump and SD prototypes; related source files are also in the repository root |
+| [`usb_ram.c`](usb_ram.c), [`usb_ram_transport.c`](usb_ram_transport.c) | Prototype RAM transfer over the USB stack (offline only) |
+
+The source files listed after the directories live directly in the repository
+root; they are not names of additional folders. Some older reports describe
+the original laboratory workspace and contain links to files that were not
+published. See [the tool guide](docs/tools-index.md) for missing dependencies.
 
 ## Building and testing
 
