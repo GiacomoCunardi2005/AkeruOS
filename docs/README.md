@@ -9,6 +9,10 @@ owned by the author.
 The project is paused. These notes publish the results; they are not a
 how-to for modifying cameras.
 
+Start with [getting started](getting-started.md), [compatibility](compatibility.md),
+the [research index](research-index.md), the [tool guide](tools-index.md),
+and [safety and limits](safety-and-limits.md).
+
 | Document | Content |
 |---|---|
 | [01-overview.md](01-overview.md) | Summary of all research areas: firmware container, boot chain, memory, kernel, GUI, keys, exposure, RAW, emulator |
@@ -36,14 +40,13 @@ not prove hardware behaviour.
   dumps: they are Nikon's copyrighted material.
 * No RAM or NAND dumps, calibration data, photos or other personal data
   from the camera used in the study.
-* No modified firmware images and no builders that produce them from the
-  Nikon package. The C sources of the RAM-dump prototypes are included as
-  documentation. The source of the DSP test payload, which made the test
+* No modified firmware images. The C sources of the RAM-dump prototypes and
+  historical scripts are included as research material; some scripts write
+  generated files. The source of the DSP test payload, which made the test
   camera unbootable, is excluded
   ([05-dsptest-incident.md](05-dsptest-incident.md)).
-* The verification scripts (Python, Ghidra) depend on the private inputs
-  above and on project-internal tooling; they are not included. The C
-  sources and host tests of this repository are included.
+* Many historical verification scripts are included but depend on inputs
+  and tooling not supplied here. See the [tool guide](tools-index.md).
 
 Addresses (for example `0x16E6E0`) refer to the CPU address space of the
 original V1.1 firmware and are given only to make the findings checkable by

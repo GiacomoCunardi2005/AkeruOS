@@ -1,12 +1,18 @@
 # AkeruOS — Nikon COOLPIX S33 research
 
 AkeruOS was an experiment to give the Nikon COOLPIX S33 (firmware V1.1,
-ARCompact/ARC700 CPU) a minimal shooting-oriented user interface. It runs
-inside the original firmware and uses Nikon's own window manager, text and
-graphics services.
+ARCompact/ARC700 CPU) a minimal shooting-oriented user interface. Its
+prototypes were designed to use the original firmware's window manager, text
+and graphics services; they are not an installable release.
 
 **Status: paused (November 2026).** This repository publishes the research
 results and the original source code written during the project.
+
+**New here?** Begin with [getting started](docs/getting-started.md), check
+[camera compatibility](docs/compatibility.md), then browse the
+[research](docs/research-index.md) and [tools](docs/tools-index.md) indexes.
+A hardware test left the research camera unbootable; read the
+[incident report](docs/05-dsptest-incident.md) before considering hardware work.
 
 ## Contents
 
