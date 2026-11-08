@@ -1,0 +1,9 @@
+# build products
+build/
+*.o
+*.elf
+*.bin
+*.a
+
+# DSP hardware test payload: made the test camera unbootable, not published
+nikon_v11_memdump_worker_dsptest.c
