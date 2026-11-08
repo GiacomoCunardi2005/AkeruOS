@@ -14,6 +14,7 @@ results and the original source code written during the project.
 |---|---|
 | [`docs/`](docs/README.md) | Research findings: firmware structure, boot chain, kernel, GUI, keys, DSP instructions, boot-stage SD loader, incident report |
 | [`MDs/`](MDs/) | Original research reports, kept under their workspace paths; this collection is incomplete |
+| [`Python_Trace_Scripts/`](Python_Trace_Scripts/) | Original analysis and verification scripts; some dependencies and inputs are not included |
 | `ui/` | AkeruOS menu model (four flexible buttons), labels, mono scanline renderer |
 | `camera/` | Colour/mono selection, Mono RAW row processing, iris action adapter |
 | `nikon_v11_runtime.*` | Thin ABI wrappers around V1.1 services (task creation, delay, critical sections) |
@@ -25,9 +26,9 @@ results and the original source code written during the project.
 
 * Target code is built with an ARC GNU toolchain (`-mcpu=arc700`). See the
   `Makefile`.
-* The `*-verify` Makefile targets call private verification scripts that
-  need the Nikon firmware and camera dumps. Those scripts and inputs are not
-  part of this repository.
+* Some `*-verify` targets depend on scripts or inputs that are not included.
+  Many research scripts require Nikon firmware, camera dumps or local tools;
+  they are preserved for reference and are not necessarily runnable here.
 * The host unit tests are plain C11, for example:
 
 ```sh
@@ -45,7 +46,6 @@ The CPU simulator used for emulation is in the companion repository
 * No Nikon firmware and no extracted or derived binaries.
 * No disassembly listings or traces.
 * No camera dumps, calibration data, photos or personal data.
-* No builders that produce modified firmware images.
 * No source for the DSP hardware test that made the test camera
   unbootable.
 

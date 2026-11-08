@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""Admit six nominal cells and preserve two unbounded expressions without inflation."""
+import argparse,hashlib,json,shutil,subprocess,sys
+from collections import Counter,defaultdict
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def load(p):return json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,indent=2)+'\n')
+def main():
+ ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--parent',type=Path,required=True);ap.add_argument('--source',type=Path,required=True);ap.add_argument('--audit',type=Path,required=True);args=ap.parse_args();parent=args.parent.resolve();src=args.source.resolve();audit_path=args.audit.resolve();ledger=load(parent/'sha256.json');assert all(sha(parent/p)==h for p,h in ledger.items())
+ d=load(src/'verified_evidence.json');audit=load(audit_path);assert d['status']=='PASS_FE6_INDEXED_FAMILIES_SEPARATE_ADMISSION'and audit['status']=='PASS_FE6_INDEXED_FAMILY_FORMULA_SCOPE_AUDIT'
+ for mapping in[d['input_hashes'],audit['input_sha256']]:assert all(sha(Path(p))==h for p,h in mapping.items())
+ assert all(sha(src/p)==h for p,h in d['files'].items());old=load(parent/'register_map.json');known={(r['space'],r['number'])for r in old['records']};events=defaultdict(list);aliases=defaultdict(list);examples=defaultdict(list);attempts=[]
+ for c in d['cases']:
+  if not c['observer_enabled']:continue
+  if c['scope_kind']=='incomplete_attempt':assert not c['completed_memory_events'];attempts.extend(c['attempts_without_result']);continue
+  assert c['exit_code']==0 and c['full_selected_paths_completed'];target=events if c['scope_kind']=='nominal_control'else aliases if c['scope_kind']=='signed_alias'else examples
+  for e in c['completed_memory_events']:target[e['address']].append(dict(case=c['name'],**e))
+ assert len(events)==6 and sum(map(len,events.values()))==114 and sum(map(len,aliases.values()))==12 and sum(map(len,examples.values()))==84 and len(examples)==18 and len(attempts)==1;assert not any(('soc_mmio',a)in known for a in events)
+ out=parent.parent/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ');assert not out.exists();shutil.copytree(parent,out);(out/'sha256.json').unlink();ev=out/'evidence';scripts=ROOT/'Python_Trace_Scripts'
+ for original,name in[(src/'verified_evidence.json','fe6_indexed_families.json'),(audit_path,'fe6_indexed_families_audit.json'),(src/'caller_census.json','fe6_indexed_caller_census.json'),(src/'original_windows.txt','fe6_indexed_families_disassembly.txt'),(src/'s33_verify_fe6_indexed_families.py','s33_verify_fe6_indexed_families.py'),(scripts/'s33_census_fe6_indexed_callers.py','s33_census_fe6_indexed_callers.py'),(scripts/'s33_audit_fe6_indexed_families.py','s33_audit_fe6_indexed_families.py'),(Path(__file__),Path(__file__).name)]:shutil.copy2(original,ev/name)
+ sources=[dict(file=str(ev/'fe6_indexed_families.json'),line=1),dict(file=str(ev/'fe6_indexed_families_audit.json'),line=1)];mmio=load(ev/'mmio_documented.json')
+ for a,rows in sorted(events.items()):
+  status=a&255==0xc4;meanings=['Returns value&0x10(bit4), not normalized']if status else['Software set/clear bits1/2 when argument==1; other values clear','Separate bit0 setter treats any nonzero argument as set, zero as clear']
+  mmio['records'].append(dict(address=f'0x{a:08X}',namespace='soc_mmio',subsystem='fe6_stride256_nominal_control_physical_function_unknown',width_bits=16,access='/'.join(sorted({e['operation']for e in rows}))+'_halfword_di',confidence='original_guest_nonnegative_control_branch_fixture',hardware_verified=False,fields=[dict(meaning=s,evidence_type='software_operation',physical_meaning='unknown')for s in meanings],observed_accesses=rows,observed_write_values=sorted({hex(e['value'])for e in rows if e['operation']=='write'}),sources=sources,software_argument_wrap_observations=aliases.get(a,[]),evidence=['original_bytes_bound','nominal_nonnegative_inputs0_1_2','delegating_memory_observer'],unknown=['Physical name/implementation/reset/access permissions/IRQ/timing unknown.','No direct BL or exact pointer caller anchor found in16payloads; synthetic callers prove isolated behavior only.','Signed comparison also admits negative values; argument-wrap observations are not physical aliases.']))
+ mmio['counts'].update(register_addresses=len(mmio['records']),direct_or_reported_accesses=len(mmio['records']));save(ev/'mmio_documented.json',mmio)
+ families=load(ev/'mmio_parametric_families.json')if(ev/'mmio_parametric_families.json').exists()else dict(schema='akeruos_computed_mmio_families_v1',families=[])
+ for f in audit['computed_mmio_families']:
+  item=dict(f,sources=sources,example_transfer_file=str(ev/'fe6_indexed_families.json'),caller_census_file=str(ev/'fe6_indexed_caller_census.json'),limits=['Unbounded r1 can move the target outside this MMIO cluster; formulas do not define a physical register bank.','No concrete register is admitted from these structural sample transfers.']);assert not any(x['entry']==item['entry']for x in families['families']);families['families'].append(item)
+ save(ev/'mmio_parametric_families.json',families)
+ metadata=load(out/'atlas_metadata.json');metadata.update(date='2026-10-25',parent_atlas=str(parent),parent_ledger_sha256=sha(parent/'sha256.json'),parent_ledger_files_verified=len(ledger),fe6_indexed_nominal_new_addresses=6,fe6_indexed_nominal_events=114,fe6_indexed_signed_alias_events=12,fe6_indexed_family_example_events_not_admitted=84,fe6_indexed_family_example_cells_not_admitted=18,fe6_indexed_unbounded_families=2,fe6_indexed_incomplete_attempts=1,fe6_indexed_scenarios=6,fe6_indexed_trace_identical_pairs=6,whole_physical_map_complete=False);save(out/'atlas_metadata.json',metadata)
+ completion=load(out/'completion_audit.json');completion['requirements'][2]['limits']=['474 software-level MMIO addresses do not delimit the physical universe or prove hardware semantics','Two computed store families have exact software formulas but unresolved caller index domains; samples are excluded from concrete register admission'];completion['next_work']=['Resolve computed/tail caller domains for2C6B74/2C6C70 and expand remaining FE6/FF7/FFB/FFC families','Resolve remaining AUX code/data candidates and parametric families','Obtain actual BCR/SoC configuration evidence without promoting fixture values'];save(out/'completion_audit.json',completion)
+ for name in['s33_build_register_atlas.py','s33_verify_register_trace_sites.py']:subprocess.run([sys.executable,str(scripts/name),str(out)],check=True)
+ subprocess.run(['/home/jack/.local/share/pipx/venvs/graphifyy/bin/python',str(scripts/'s33_build_register_graph.py'),str(out)],check=True)
+ atlas=load(out/'register_map.json');assert len(atlas['records'])==735 and Counter(r['space']for r in atlas['records'])==dict(core=64,aux=197,soc_mmio=474);keys={(r['space'],r['number'])for r in atlas['records']};assert keys-known=={('soc_mmio',a)for a in events};assert not any(('soc_mmio',a)in keys for a in set(examples)|{e['address']for e in attempts})
+ assert len(atlas['computed_mmio_families'])==2 and all(f['concrete_registers_admitted']==0 and not f['hardware_verified']for f in atlas['computed_mmio_families']);assert len(atlas['aux_indices_with_guest_semantic_records'])==22 and len(load(out/'aux_trace_site_verification.json')['checks'])==74;assert not atlas['goal_complete']and all(not r['hardware_verified']for r in atlas['records'])
+ graph=load(out/'graph.json');assert sum(n.get('file_type')=='computed_address_family'for n in graph['nodes'])==2
+ inputs={**d['input_hashes'],**audit['input_sha256']};assert all(sha(Path(p))==h for p,h in inputs.items());assert all(sha(parent/p)==h for p,h in ledger.items())
+ save(out/'atlas_validation.json',dict(status='PASS_FE6_INDEXED_FAMILIES_NO_INFLATION_INTEGRATION',total_records=735,counts=atlas['counts'],new_mmio_addresses=6,parametric_families=2,nominal_completed_events=114,signed_alias_events=12,structural_example_events_excluded_from_admission=84,structural_example_addresses_not_admitted=18,incomplete_attempts_excluded=1,selected_scenarios=6,trace_identical_pairs=6,caller_census_payloads=16,caller_census_BL_candidates=0,caller_census_pointer_candidates=0,representative_aux_guest_indices=22,aux_run_pc_sites=74,parent_ledger_files_verified=len(ledger),input_sha256=inputs,gnu_original_inputs_unchanged=True,whole_physical_map_complete=False,limits=d['limits']))
+ for name in['s33_build_register_atlas.py','s33_build_register_graph.py','s33_verify_register_trace_sites.py']:shutil.copy2(scripts/name,ev/name)
+ files={str(p.relative_to(out)):sha(p)for p in sorted(out.rglob('*'))if p.is_file()and p!=out/'sha256.json'};save(out/'sha256.json',files);print('PASS735records,6newMMIO,2parametric families;84example events not admitted;ledger',len(files));print(out)
+if __name__=='__main__':main()
