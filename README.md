@@ -13,6 +13,7 @@ results and the original source code written during the project.
 | Path | What it is |
 |---|---|
 | [`docs/`](docs/README.md) | Research findings: firmware structure, boot chain, kernel, GUI, keys, DSP instructions, boot-stage SD loader, incident report |
+| [`MDs/`](MDs/) | Original research reports, kept under their workspace paths; this collection is incomplete |
 | `ui/` | AkeruOS menu model (four flexible buttons), labels, mono scanline renderer |
 | `camera/` | Colour/mono selection, Mono RAW row processing, iris action adapter |
 | `nikon_v11_runtime.*` | Thin ABI wrappers around V1.1 services (task creation, delay, critical sections) |
@@ -47,6 +48,10 @@ The CPU simulator used for emulation is in the companion repository
 * No builders that produce modified firmware images.
 * No source for the DSP hardware test that made the test camera
   unbootable.
+
+Original reports may refer to local paths or other reports and evidence that
+are not included here. Their presence in a reference does not mean those
+files are published. Further workspace material remains to be reviewed.
 
 Details are in [`docs/README.md`](docs/README.md).
 
