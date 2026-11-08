@@ -19,6 +19,7 @@ A hardware test left the research camera unbootable; read the
 | Path | What it is |
 |---|---|
 | [`docs/`](docs/README.md) | Research findings: firmware structure, boot chain, kernel, GUI, keys, DSP instructions, boot-stage SD loader, incident report |
+| [`references/`](references/README.md) | Reference documents, source links and third-party licences |
 | [`MDs/`](MDs/) | Original research reports, kept under their workspace paths; this collection is incomplete |
 | [`Python_Trace_Scripts/`](Python_Trace_Scripts/) | Original analysis and verification scripts; some dependencies and inputs are not included |
 | [`coolpix-s33-re/`](coolpix-s33-re/) | Firmware container parser and synthetic tests, with their original MIT licence |
@@ -84,3 +85,5 @@ is not affiliated with or endorsed by Nikon.
 
 GPL-3.0-or-later. See [`LICENSE`](LICENSE).
 The files in `coolpix-s33-re/` retain their own [MIT licence](coolpix-s33-re/LICENSE).
+Third-party material in `references/` retains its original terms; see
+[`references/README.md`](references/README.md).

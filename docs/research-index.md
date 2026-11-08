@@ -5,6 +5,8 @@ Italian and retain their original paths, dates, assumptions and links. Some
 links point to private inputs or evidence that are not in this repository.
 Later reports may correct earlier findings.
 
+For manuals and data sheets, see the [reference collection](../references/README.md).
+
 | Topic | Start here | Example original report |
 |---|---|---|
 | Container and boot | [Overview](01-overview.md), [boot-stage SD path](03-boot-sd-path.md) | [Runtime startup and tasks](../MDs/S33_Avvio_Runtime_e_Creazione_Task.md) |
