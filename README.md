@@ -11,6 +11,8 @@ results and the original source code written during the project.
 **New here?** Begin with [getting started](docs/getting-started.md), check
 [camera compatibility](docs/compatibility.md), then browse the
 [research](docs/research-index.md) and [tools](docs/tools-index.md) indexes.
+A [firmware map](docs/firmware-map.md) identifies known boot, autofocus,
+flash, image and other research locations, with their evidence and limits.
 A hardware test left the research camera unbootable; read the
 [incident report](docs/05-dsptest-incident.md) before considering hardware work.
 

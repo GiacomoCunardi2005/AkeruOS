@@ -11,7 +11,7 @@ how-to for modifying cameras.
 
 Start with [getting started](getting-started.md), [compatibility](compatibility.md),
 the [research index](research-index.md), the [tool guide](tools-index.md),
-and [safety and limits](safety-and-limits.md).
+the [firmware map](firmware-map.md), and [safety and limits](safety-and-limits.md).
 
 | Document | Content |
 |---|---|

@@ -6,6 +6,7 @@ links point to private inputs or evidence that are not in this repository.
 Later reports may correct earlier findings.
 
 For manuals and data sheets, see the [reference collection](../references/README.md).
+For locations by function, see the [firmware map](firmware-map.md).
 
 | Topic | Start here | Example original report |
 |---|---|---|
