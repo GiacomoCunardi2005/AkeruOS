@@ -1,0 +1,9 @@
+# Il chiamante del tempo compare anche nella chiusura LiveView — 6 novembre 2026
+
+La prova [menu tempo → `0x14A1FC` → richiesta/CapMgr](S33_GUI_Tempo_Ritorno_Task_Chiamante_CPU_20261106.md) **non dimostra un percorso di scatto**. Nel firmware V1.1 la tabella originale associa l'evento `0x4405` a `0x65959C`, handler di chiusura di AutoSceneLiveView. In un ramo di tale handler, la chiamata `0x659B40` raggiunge proprio `0x14A1FC`: il confronto con `0x55` a `0x659B32` può saltare quel ramo. Il significato completo delle guardie non è stabilito.
+
+La precedente [prova CPU dell'handler](S33_GUI_AutoSceneLiveView_Close_Handler_4405_CPU_20261101.md) include il caso `close_ptr`: con le sue fixture, il percorso chiama `0x14A1FC`. Tuttavia in quella prova `0x14A1FC` è sostituita da una fixture. La prova più recente esegue `0x14A1FC` e il calcolo originale, ma li invoca dal banco separatamente: **non esiste ancora una singola esecuzione che colleghi entrambi i banchi**.
+
+Il [controllo ripetibile](../Python_Trace_Scripts/s33_verify_time_close_path_static.py) confronta byte e tabella col dump V1.1, verifica i siti di chiamata e controlla il manifest della prova CPU storica: [evidenze](../Risultati/GUI_S33/time_close_path_static_20261106T091248557580Z/evidence.json). Altri siti candidati di chiamata a `0x14A1FC` esistono; questo singolo chiamante non ne definisce l'uso esclusivo.
+
+Per la fotografia, l'analisi statica preesistente individua invece un percorso candidato `CaptureImage → 0x1B9EA8 → 0x14AA24` e uno stato 7 di CapMgrTask, distinto dallo stato 5/slot `+0x10` studiato nel banco tempo. Vedere [ingresso acquisizione](S33_Ingresso_Acquisizione.md): resta aperto se e quando il valore tempo selezionato venga utilizzato nel percorso effettivo, nonché il collegamento al tasto fisico S2. I dati precedenti sul calcolo sono prove CPU con fixture, non prova di posa o sensore. Nessun hardware o supporto modificato; **NON_INSTALLARE**.

@@ -1,0 +1,9 @@
+# S33 — lookup testi GUI in CPU emulata
+
+Il 27 ottobre 2026 ho eseguito in GNU ARC700 le routine originali V1.1 `0x6337C4` e `0x1286C4` usando come memoria di laboratorio i blocchi inglese e italiano estratti dal TBM originale e confrontati con `MainCode.dmp`. Le istruzioni delle due routine non sono modificate; il flag di disponibilità è impostato dal banco.
+
+Per ciascuno dei due blocchi, le sette chiamate con gli ID dei record di CaptureMenu restituiscono puntatori ai byte delle stringhe già [ricostruite staticamente](S33_GUI_CaptureMenu_Testi_Italiani_20261027.md). I byte letti dal banco corrispondono alle sette stringhe previste. Il test include inoltre l'ID 380, gli ingressi 0 e 381 del wrapper, e controlli con flag disattivato o ingresso fuori intervallo diretto: **28 casi PASS**, stack preservato. Nel contesto sintetico, il flag disattivato fa restituire al lookup l'indirizzo di fallback `0x36686C`; il wrapper restituisce zero per ID zero e inoltra 381 senza chiamare il lookup.
+
+Il banco mappa i dati originali a `0x43E170` e imposta il byte `0x366868`; questi sono preparativi sintetici, non una misura della RAM fisica né una prova che il caricatore li abbia popolati sulla fotocamera. La CPU non esegue il caricatore originale, il backend, il disegno del testo o la selezione reale della lingua. L'esito dimostra il comportamento delle due routine su questi dati e ingressi, non ciò che appare sul display.
+
+[Verificatore](../Python_Trace_Scripts/s33_verify_gui_text_lookup_cpu.py), [casi e puntatori](../Risultati/GUI_S33/capture_text_cpu_20261027T175931Z/cases.json), [finestre GNU](../Risultati/GUI_S33/capture_text_cpu_20261027T175931Z/gnu_windows.txt), tracce [inglese](../Risultati/GUI_S33/capture_text_cpu_20261027T175931Z/english.trace) e [italiano](../Risultati/GUI_S33/capture_text_cpu_20261027T175931Z/italian.trace). Nessuna operazione su firmware, SD o fotocamera; **NON_INSTALLARE**.

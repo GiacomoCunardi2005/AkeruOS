@@ -1,0 +1,15 @@
+# S33 — prototipo di coda delle pressioni
+
+Il modello sequenziale in `AkeruOS/ui/menu.c` ora può conservare fino a quattro pressioni logiche mentre un'azione è attiva. `akeru_menu_enqueue` riconosce le pressioni, consuma i rilasci senza inserirli e ignora gli eventi non pertinenti. `akeru_menu_next` elabora le pressioni nell'ordine applicando il modello alla schermata solo quando non c'è già un'azione attiva. Il chiamante segnala la fine mediante `akeru_menu_complete`: con `discard=1` elimina anche le pressioni rimaste. Un'azione di ridisegno richiede ugualmente la conferma di completamento.
+
+Se arriva una quinta pressione a coda piena, essa **non viene conservata**: `enqueue` restituisce `-2`, imposta `overflow` persistente e blocca l'elaborazione finché il chiamante non sceglie esplicitamente di scartare la coda. Come verificato nel [rapporto precedente](S33_GUI_Ciclo_Coda_Azione_Occupata_CPU_20261030.md), il valore di ritorno del dispatcher Nikon non è sufficiente a propagare questo errore; un'integrazione dovrà osservare e gestire il flag. Quattro è una capacità sperimentale, non un dimensionamento verificato della camera.
+
+## Verifica
+
+`make -C AkeruOS menu-model-verify` passa su host con UBSan e GNU ARC700: sequenza ISO → diaframma → indietro, rilasci, blocco finché l'azione è attiva, coda piena sia con azione attiva sia senza, scarto esplicito e input invalidi. [Risultati](../Risultati/GUI_S33/akeru_menu_model_20261030T153336Z/). Il test della pipeline colore preesistente passa su host e ARC700: [risultati](../Risultati/GUI_S33/akeru_color_pipeline_20261030T153250Z/).
+
+Nel [banco sperimentale](../Python_Trace_Scripts/s33_verify_gui_manager_deferred_action_cpu.py), invocato con `--queued`, due tasti logici sintetici attraversano produttore e coda originali e il tratto originale `0x15AF2E` del ciclo WindowManager; il callback sostituito nella copia li accoda nel modello anziché rifiutarli. Il banco pone artificialmente un'azione precedente in stato attivo e, quando la coda Nikon è vuota, la fixture **simula** il completamento delle azioni: vengono restituite in ordine le richieste diaframma e ridisegno/indietro, terminando sulla schermata principale. [Risultati](../Risultati/GUI_S33/manager_buffered_menu_cpu_20261030T153336Z/) e [sequenza](../Risultati/GUI_S33/manager_buffered_menu_cpu_20261030T153336Z/loop.json). Il confronto senza coda conserva il comportamento precedente: [risultati](../Risultati/GUI_S33/manager_deferred_menu_cpu_20261030T153326Z/).
+
+## Limiti
+
+Il modello è sequenziale, non thread-safe e non è collegato a un worker reale; un'integrazione deve garantire accesso serializzato, durata dei dati, notifiche, gestione dell'overflow e momenti sicuri di completamento. La prova non decide quali pressioni restino valide durante un menu modale o dopo il cambio schermata: applicare automaticamente eventi vecchi potrebbe essere sbagliato; lo scarto va deciso in base al lifecycle reale. Il banco entra a metà ciclo, usa callback e stato sintetici e **non esegue** ISO, iride o rendering. Scheduler, tasti fisici e fotocamera non sono verificati. Nessun firmware installato: **NON_INSTALLARE**.

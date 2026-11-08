@@ -1,0 +1,11 @@
+# GUI esposizione — FEE03E4 e correzione della fixture, 28 ottobre 2026
+
+La [prova precedente](S33_GUI_Esposizione_FEE04B0_CPU_20261028.md) si fermava a `0x20A7A4`. Qui il codice V1.1 esegue due sequenze di lettura/modifica/scrittura a 16 bit su `0x0FEE03E4`, prima cancellando il bit 14 e poi il bit 15. I byte eseguiti `0x20A798..0x20A7BB` coincidono col dump originale.
+
+Il primo tentativo, con mapfile separati per `FEE03C0` e `FEE03E4`, dichiarava seed `2525` e `E525`, ma **entrambe le tracce leggono zero** a `0x20A7A4`, e sono identiche. I file `FEE03E4` finali conservano i seed: questi run non dimostrano la variazione voluta. Non è stabilito se un accesso precedente, la configurazione dei mapfile o altro sia responsabile; non assumere che il seed dichiarato sia stato letto.
+
+Ripetendo con un'unica regione sintetica contigua `FEE03C0..FEE03E5`, la prima lettura rispecchia entrambi i seed. Con `2525` i due bit sono già zero e le due scritture restano `2525`; con `E525`, la prima scrittura produce `A525` e la seconda `2525`. Seed `FEB0000=A5A0`, `FEE03C0=A5A1`, `FEE04B0=A5A4`, contesto e servizi sono comuni. I valori sono sintetici, non misure del dispositivo.
+
+Entrambe le nuove prove GUI sono **FAIL**: dopo 13.692 istruzioni si arrestano sulla lettura non mappata `0x0FEE0638` a `0x20D2B0`, nel primo dei quattro casi. Il [verificatore dell'audit](../Python_Trace_Scripts/s33_audit_gui_fee03e4.py) PASS controlla hash, seed, letture effettive, entrambe le scritture, backing e fault: non è un PASS del ritorno al menu. [Run 2525](../Risultati/GUI_S33/exposure_return_fee03e4_combined_2525_20261028T144423Z/verified_evidence.json), [run E525](../Risultati/GUI_S33/exposure_return_fee03e4_combined_e525_20261028T144423Z/verified_evidence.json), [banco](../Python_Trace_Scripts/s33_verify_gui_exposure_return_fee03e4_combined_cpu.py). I tentativi con mapfile separati sono conservati sotto `exposure_return_fee03e4_*_20261028T144348Z`.
+
+Le scritture nel backing ordinario non dimostrano il comportamento di periferiche reali, che potrebbe dipendere da effetti collaterali o timing. Il display, il ciclo completo, i tasti fisici, lo scatto e la persistenza rimangono non verificati; DSP v7, AUX69 e servizi sono modelli. **NON_INSTALLARE**.

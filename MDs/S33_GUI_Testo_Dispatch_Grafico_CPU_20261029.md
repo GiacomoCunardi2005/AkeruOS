@@ -1,0 +1,9 @@
+# GUI — servizio grafico originale dopo il testo
+
+Il 29 ottobre 2026 ho esteso la [prova precedente](S33_GUI_Testo_Posizione_Callback_Originale_CPU_20261029.md) eseguendo anche la routine originale `0x156768`. Nel ramo con convertitore non nullo, essa passa stringa e coordinate al callback di conversione, riceve un puntatore attraverso una cella sullo stack e lo inoltra a `0x23AFD8` insieme alle coordinate e al valore 1. Il getter del convertitore, il convertitore e `0x23AFD8` sono fixture del banco; il descrittore restituito è sintetico e non rappresenta glifi.
+
+**16 casi PASS**, sette etichette non nulle e un campo zero per ciascuno dei blocchi lingua inglese e italiano. I 14 casi non nulli consegnano al convertitore il puntatore al testo atteso e coordinate sintetiche `(12,70)`; la fixture grafica riceve quelle coordinate, il descrittore sintetico `0x2008000` e valore 1. I due casi zero non raggiungono il disegnatore. Stack e contenuto finale delle stringhe sono invariati. La traccia conferma ingresso a `0x156768` e chiamata a `0x23AFD8`.
+
+[Verificatore](../Python_Trace_Scripts/s33_verify_gui_text_graphics_dispatch_cpu.py), [casi](../Risultati/GUI_S33/menu_text_graphics_dispatch_cpu_20261029T225827Z/cases.json), [manifest e tracce](../Risultati/GUI_S33/menu_text_graphics_dispatch_cpu_20261029T225827Z/verified_evidence.json), [fixture](../Risultati/GUI_S33/menu_text_graphics_dispatch_cpu_20261029T225827Z/fixture_patches.json). La precedente esecuzione `225817Z` verificava puntatore e coordinate; quella finale aggiunge il controllo del valore passato al disegnatore.
+
+Il banco forza il ramo col convertitore non nullo: non prova quale ramo sia attivo nella macchina, il formato del descrittore prodotto da un convertitore reale o l'esecuzione del disegnatore. Non sono stati verificati font, pixel, display, tasti o indirizzi RAM fisici; firmware originale e dispositivo invariati. **NON_INSTALLARE**.

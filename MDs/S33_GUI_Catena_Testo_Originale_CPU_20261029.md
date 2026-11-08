@@ -1,0 +1,9 @@
+# GUI — voce, servizio e separazione testo in un percorso
+
+Il 29 ottobre 2026 ho collegato nel simulatore GNU ARC700 le routine originali `0x631F44 → 0x186D08 → 0x186C40 → 0x186B14`. Il controllo e i record sono sintetici; il disegno finale dei caratteri, la misurazione, le metriche, le icone e alcuni servizi sono fixture. Il callback finale registra il puntatore al testo, senza produrre pixel.
+
+**16 casi PASS**: sette etichette non nulle e un campo zero con ciascuno dei blocchi italiano e inglese originali mappati in RAM sintetica. Per ogni etichetta, il backend originale `0x186C40` e il separatore originale `0x186B14` sono eseguiti due volte, nei percorsi di misurazione e di disegno; il callback di disegno simulato riceve una volta il puntatore atteso. Il campo zero non chiama il servizio testo. Stack e contenuto finale dei blocchi e delle stringhe sintetiche sono invariati.
+
+Nelle condizioni del banco il flag di limite esplicito non è attivo e il separatore usa il limite di default: le etichette provate non vengono divise. Il caso di separazione e ripristino è stato verificato separatamente con larghezza e flag impostati dal banco: [prova precedente](S33_GUI_Testo_Separatore_Originale_CPU_20261029.md). Non si deduce che il menu fisico usi queste condizioni o metriche.
+
+[Verificatore](../Python_Trace_Scripts/s33_verify_gui_item_text_chain_cpu.py), [casi](../Risultati/GUI_S33/menu_text_chain_cpu_20261029T225655Z/cases.json), [manifest e tracce](../Risultati/GUI_S33/menu_text_chain_cpu_20261029T225655Z/verified_evidence.json), [fixture](../Risultati/GUI_S33/menu_text_chain_cpu_20261029T225655Z/fixture_patches.json). Non è eseguito il disegnatore originale dei glifi, né sono dimostrati font, framebuffer, memoria fisica, concorrenza o tasti. Firmware e dispositivo originali invariati; **NON_INSTALLARE**.

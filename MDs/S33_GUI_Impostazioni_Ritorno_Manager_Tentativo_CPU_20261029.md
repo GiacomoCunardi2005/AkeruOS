@@ -1,0 +1,9 @@
+# Ritorno dalle impostazioni con manager originale — tentativi
+
+Il 29 ottobre 2026 ho provato a estendere il [banco con descrittore sintetico](S33_GUI_Descrittore_Impostazioni_Dispatch_CPU_20261029.md) alla consegna dell'evento `0x580` di ritorno. Il banco predispone una catena di contesto sintetica e conserva il gestore originale di apertura: l'obiettivo è osservare le destinazioni già identificate nella [prova isolata](S33_GUI_Impostazioni_Ritorno_Contesto_CPU_20261029.md).
+
+Il [primo tentativo](../Risultati/GUI_S33/descriptor_settings_back_cpu_20261029T053738Z/verified_evidence.json) entra nell'handler originale `0x7EAAD8` per il primo caso, ma durante la successiva inizializzazione si arresta dopo 48.451 istruzioni con lettura disallineata a `0x034203A9`, PC `0x12CAFA`. In traccia il puntatore letto da `0x369348` è zero, e la catena successiva legge dati non validi. Non è stata verificata la transizione completata né il secondo caso.
+
+Nel [secondo tentativo](../Risultati/GUI_S33/descriptor_settings_back_cpu_20261029T053812Z/verified_evidence.json), il banco inizializza una struttura sintetica zero collegata a `0x369348`. La CPU entra in un percorso di cambio contesto, carica stack zero e il simulatore si arresta con segnale 4 dopo 15.363 istruzioni; questo arresto avviene **prima** dell'evento di ritorno. La struttura sintetica non è un modello valido dello scheduler e non va interpretata come stato fisico o RAM disponibile. Entrambi i tentativi sono **FAIL**; non modificano il firmware originale.
+
+Le tracce evidenziano che una prova integrata richiede un contesto scheduler coerente, oppure un perimetro di simulazione diverso esplicitamente verificato. Non dimostrano un guasto della fotocamera, tasti fisici, visualizzazione, ritorno al nuovo menu o persistenza. [Banco](../Python_Trace_Scripts/s33_verify_gui_descriptor_settings_back_cpu.py), snapshot e fixture nei risultati; **NON_INSTALLARE**.

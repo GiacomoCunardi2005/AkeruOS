@@ -1,0 +1,17 @@
+# Menu AkeruOS / ISO — rifiuto, nuovo tentativo e ritorno in CPU emulata
+
+Data 2026-11-04, firmware V1.1. Il banco estende la [sequenza scanner → menu → ISO](S33_GUI_Menu_Scanner_ISO_Sequenza_CPU_20261104.md), con codice originale verificato dopo il link, descrittore AkeruOS e controllo ISO sintetici, RAM e servizi fixture. Gli eventi sono estratti dalla coda e consegnati esplicitamente al dispatcher.
+
+## Rifiuto e nuova pressione: 4/4
+
+Due ordini delle callback × con/senza nuovo tentativo. Il manager originale, con busy=1, rifiuta la richiesta ISO: il descrittore sperimentale rimane corrente. Il banco aveva già prelevato l'azione `OPEN_ISO`: la cella pending è vuota. Con il successivo sblocco busy=0 **senza nuova pressione** non viene richiesta alcuna apertura. Se invece lo scanner emette una nuova pressione/rilascio logici `0x700/701`, il callback del modello produce nuovamente `OPEN_ISO`; il banco la preleva e richiama il manager, che apre il descrittore ISO `0x989FCC`. Il recupero è quindi una nuova richiesta esplicita, non un retry automatico.
+
+## Ritorno condizionato: 8/8
+
+Due ordini × due valori ISO (120/140) × busy ritorno 0/1. Dopo navigazione e conferma reali nel banco, il callback originale ISO richiede ID `0x36`. **Per il solo esperimento**, prima della conferma il banco sostituisce il puntatore del manager con una tabella in RAM sintetica: ID `0x36` punta al descrittore AkeruOS e ID `0x3F` all'ISO originale. La tabella originale e il firmware non sono modificati; nella configurazione originale ID `0x36` non è dimostrato come ritorno AkeruOS.
+
+Con busy=0 il manager originale cambia finestra dal descrittore ISO a quello sperimentale. Il banco estrae la notifica `0x4409`, azzera esplicitamente il controllo attivo e genera una nuova pressione/rilascio classe 67: il callback del modello riceve l'evento e lascia pendente la richiesta `OPEN_APERTURE`. Il parametro ISO software rimane 120 oppure 140 nel banco. Con busy=1 la richiesta di ritorno è rifiutata, il descrittore ISO rimane corrente e non viene eseguita la nuova pressione. L'apertura effettiva dell'iride non è verificata.
+
+Il servizio di chiusura `0x16A0BC` è eseguito con byte originali; le sue chiamate `0x17BF60` e `0x149134` sono stub registrati: cancellazione degli eventi e timer non sono effettivamente eseguiti. L'handler `0x4409`, selezione risorse, refresh, lock e ulteriori servizi restano stub. Due tentativi intermedi sono terminati in timeout perché mancavano finestre/servizi di laboratorio; sono conservati come FAIL, non attribuiti all'hardware. Stato iniziale, tabella, gate, controllo e ordine sono imposti; il prototipo usa il singolo pending, non la coda con ownership. Non sono dimostrati instradamento autonomo, rientro con tabella originale, eliminazione della coda, sincronizzazione, mapping fisico, persistenza o effetto sul sensore. **NON_INSTALLARE**.
+
+Riproduzione: `python3 Python_Trace_Scripts/s33_verify_key_scanner_menu_iso_retry_cpu.py` ([4/4](../Risultati/GUI_S33/key_scanner_menu_iso_open_cpu_20261104T154110738036Z/verified_evidence.json)); `python3 Python_Trace_Scripts/s33_verify_key_scanner_menu_iso_return_cpu.py` ([8/8](../Risultati/GUI_S33/key_scanner_menu_iso_return_cpu_20261104T154101387075Z/verified_evidence.json)). Regressione sequenza ISO senza ritorno [4/4](../Risultati/GUI_S33/key_scanner_menu_iso_navigation_cpu_20261104T154110730845Z/verified_evidence.json).

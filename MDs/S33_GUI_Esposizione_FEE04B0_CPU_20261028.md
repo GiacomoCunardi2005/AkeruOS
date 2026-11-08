@@ -1,0 +1,9 @@
+# GUI esposizione — FEE04B0 nel ritorno CPU, 28 ottobre 2026
+
+Due continuazioni del [banco precedente](S33_GUI_Esposizione_FEE03C0_Rami_CPU_20261028.md) variano solo il seed dichiarato della halfword modellata `0x0FEE04B0`: `0xA5A0` e `0xA5A4`, rispettivamente bit 2 spento e acceso. I seed `FEB0000=A5A0` e `FEE03C0=A5A1` e il resto della configurazione del banco rimangono invariati.
+
+In entrambi i casi il percorso originale raggiunge `0x20A784`, pone `r0=2`, legge `FEE04B0` a `0x20A78C`, cancella il bit 2 e scrive a `0x20A794`: `A5A0→A5A0` e `A5A4→A5A0`. Il backing ordinario finale contiene `A0 A5`; la traccia della scrittura riporta l'operando esteso `FFFFA5A0`. Le finestre dei byte eseguiti `0x20A782..0x20A7A7` sono identiche al dump V1.1.
+
+Successivamente la CPU tenta una lettura halfword da `0x0FEE03E4` a `0x20A7A4`, non mappata. Entrambe le esecuzioni falliscono dopo 13.619 istruzioni nel primo caso: la GUI e il ritorno non sono completati. [Run A5A0](../Risultati/GUI_S33/exposure_return_fee04b0_a5a0_20261028T144248Z/verified_evidence.json), [run A5A4](../Risultati/GUI_S33/exposure_return_fee04b0_a5a4_20261028T144248Z/verified_evidence.json), [banco](../Python_Trace_Scripts/s33_verify_gui_exposure_return_fee04b0_cpu.py). Il banco salva uno snapshot del sorgente effettivo derivato dal precedente e un file seed; le sostituzioni sono controllate per unicità.
+
+[Audit indipendente](../Python_Trace_Scripts/s33_audit_gui_fee04b0.py) PASS: hash di traccia, seed, backing e snapshot, operazioni e fault attesi. Questo PASS non è un PASS della GUI. Tracce e mapfile finali descrivono il simulatore con servizi, contesti e MMIO sintetici; DSP v7 e AUX 69 sono sperimentali. Non provano effetti, temporizzazione o valori reali dei registri, né tasti fisici, scatto o persistenza. **NON_INSTALLARE**.

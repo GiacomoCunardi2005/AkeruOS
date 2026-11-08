@@ -1,0 +1,9 @@
+# GUI — selezione del percorso grafico a un bit
+
+Il 30 ottobre 2026 ho esteso la [prova di clipping](S33_GUI_Testo_Clipping_Originale_CPU_20261030.md): il callback grafico impostato nel contesto sintetico è ora la routine originale `0x2C8380`. Con il campo `+6=1` del descrittore sintetico, essa percorre il ramo `0x2C83C4`, chiede la conversione del colore e seleziona la routine di riga `0x2C8E4C` nella cella `0x36C7F0`. Il lookup colore è una fixture che restituisce `0x7E`; `0x2C8170` è sostituito con un registratore, quindi la routine di riga non viene chiamata e non vengono scritti pixel.
+
+**18 casi PASS** nei due blocchi lingua: 14 etichette interne, due prove `ISO` al bordo destro e due campi testo zero. Per i 16 casi non nulli la fixture riceve la struttura dopo il clipping, il valore colore sintetico `0x7E` e osserva il puntatore selezionato `0x2C8E4C`. La geometria sintetica 4×3 resta intera a `(12,70)` e diventa 2×3 a `(318,70)` su limiti 320×240; il puntatore dati sintetico è conservato. Il campo zero non raggiunge questo percorso.
+
+[Verificatore](../Python_Trace_Scripts/s33_verify_gui_text_1bit_dispatch_cpu.py), [casi](../Risultati/GUI_S33/menu_text_1bit_dispatch_cpu_20261030T100436Z/cases.json), [manifest e tracce](../Risultati/GUI_S33/menu_text_1bit_dispatch_cpu_20261030T100436Z/verified_evidence.json), [fixture](../Risultati/GUI_S33/menu_text_1bit_dispatch_cpu_20261030T100436Z/fixture_patches.json). I byte delle finestre originali sono confrontati col dump; il callback e la RAM sono impostati dal banco.
+
+La prova identifica il percorso scelto per questo descrittore **di laboratorio**, non il formato generato dal font Nikon o il callback attivo nella fotocamera. `0x2C8170`, il colore reale, i glifi, le scritture, il display e i tasti fisici restano da verificare; firmware originale invariato, **NON_INSTALLARE**.

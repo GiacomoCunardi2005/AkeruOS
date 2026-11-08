@@ -1,0 +1,13 @@
+# S33 V1.1 — controesempio alla cancellazione ISO su 4402
+
+**Data:** 2026-11-01. Prova GNU ARC700 in laboratorio, con codice Nikon originale, descrittori e servizi in parte sintetici. Nessun collegamento installabile alla fotocamera.
+
+Ho provato un wrapper sperimentale attorno al callback ISO: mantiene un contatore mentre è in corso la conferma `0x4801`; se riceve `0x4402` fuori da tale conferma e il flag sintetico di ritorno vale 1, lo azzera. Nelle nove sequenze con destinazione permissiva, questa regola evita il riuso del flag dopo l'uscita alternativa e conserva il ritorno nelle conferme esercitate. Il contatore e il wrapper sono soltanto nella copia di laboratorio.
+
+Un secondo banco aggiunge un caso avverso: il callback live view **simulato** restituisce `-1` all'evento `0x4405`. Con flag di ritorno armato e `0x2180` iniettato, il manager originale invia a ISO `4404`, `4406`, `4402`, poi, dopo il fallimento imposto, riporta ISO corrente e gli invia `4403`, `4401`, `4405`. Il wrapper aveva già cancellato il flag su `4402`. Una successiva conferma ISO, imposta dal banco senza riaprire la schermata, ritorna al menu diagnostico anziché al descrittore sperimentale desiderato; la coda AkeruOS resta sospesa. Il valore ISO software osservato è 125.
+
+Il risultato **smentisce la regola sperimentale**: `4402`, anche distinguendo le conferme annidate, può precedere il fallimento della destinazione e il ripristino di ISO. Il flag va mantenuto finché non sia nota l'effettiva destinazione e il completamento rilevante; il punto sicuro e la gestione della concorrenza non sono ancora identificati. Non è un difetto dimostrato del firmware Nikon: il flag, il wrapper e il fallimento del callback sono sintetici. Non applicare il wrapper al firmware.
+
+Riproduzione: `python3 Python_Trace_Scripts/s33_verify_gui_iso_lifecycle_guard_failure_cpu.py`; [nove casi PASS](../Risultati/GUI_S33/iso_lifecycle_guard_failure_cpu_20261101T094412Z/cases.json), trace e [sequenze lifecycle](../Risultati/GUI_S33/iso_lifecycle_guard_failure_cpu_20261101T094412Z/modal_lifecycle.json). La variante senza fallimento passa nove casi in `iso_return_lifecycle_guard_cpu_20261101T094418Z/`; modello menu host/GNU PASS `akeru_menu_model_20261101T094401Z/`. I tentativi `...094315Z`, `...094333Z`, `...094337Z` sono conservati FAIL: il primo ha rivelato il ripristino di ISO, i successivi richiedevano aggiornamento dei conteggi attesi del banco.
+
+Controllo attivo nullo, callback live view, contesto, trampoline, selezione e consegna eventi sono fixture; non sono verificati lifecycle reale, pulsanti fisici, scheduler, RAM, rendering o scatto. I byte originali usati sono confrontati col dump; nessuna scrittura a GNU, firmware originale, fotocamera o SD. **NON_INSTALLARE.**

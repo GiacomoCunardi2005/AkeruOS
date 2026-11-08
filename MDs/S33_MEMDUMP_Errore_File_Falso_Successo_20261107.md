@@ -1,0 +1,9 @@
+# MEMDUMP: errore file nascosto dal conteggio completo
+
+Il 7 novembre 2026 il banco `python3 Python_Trace_Scripts/s33_verify_memdump_held_v5.py --file-error` ha riprodotto un possibile falso successo nel candidato v5 reale. Subito dopo una seconda write riuscita nel modello, con stato zero e conteggio `0x0104064C`, la fixture inserisce `0x01A00006` in `file+0xC`: l'adattatore non lo legge e il diagnostico raggiunge il messaggio di successo `0x393044`. [Evidenza](../Risultati/Runtime_Kernel/MEMDUMP_V5_File_Error_FAT/20261107T021324280354Z/evidence.json).
+
+L'errore è **iniettato dopo una write modellata riuscita**: questa prova non mostra corruzione del file né un guasto fisico. La combinazione stato zero, conteggio completo e errore `0x01A00006` era già stata osservata nel [banco FAT con cache record mancante](S33_Dumper_RAM_SD_File_FAT_Creazione_Scrittura_Close_e_Riapertura.md), separato da questo candidato. La v6 ha lo stesso limite nel sorgente dell'adattatore, ma qui non è stata eseguita con l'errore iniettato.
+
+Una [variante sorgente](../AkeruOS/nikon_v11_memdump_held_checked.c) conserva la sequenza v5 e verifica anche i quattro byte di `file+0xC` mentre l'handle è vivo; in caso di errore lascia la fase in errore e ritorna nonzero. Il [test host](../AkeruOS/tests/nikon_v11_memdump_checked_test.c), compilato con `-Wall -Wextra -Werror -fsanitize=address,undefined`, passa per i quattro byte di errore, conteggio corto, stato errore, successo e inoltro non proprietario. Il codice storico e il firmware v5 restano invariati.
+
+La variante **non è integrata in un firmware** e non ha ancora verifica ARC/P-code integrata. Il controllo del campo non garantisce persistenza fisica né sostituisce la verifica della chiusura, il cui valore il worker corrente ignora. La mappa RAM completa resta ignota; candidati **NON_INSTALLARE**.

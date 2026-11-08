@@ -1,0 +1,9 @@
+# Live view: accesso a FE80158
+
+Il 29 ottobre 2026 ho analizzato l'accesso che fermava il [tentativo di ritorno con contesto inizializzato dal banco](S33_GUI_Liveview_Contesto_43C4F4_CPU_20261029.md). Nel codice originale V1.1 `0x20D5C4`, quando il valore restituito da `0x1F0980` raggiunge la soglia `0x20000` nei casi provati, `0x20D5F0` legge una halfword a `0x0FE80158`, azzera il bit 0 e la riscrive a `0x20D5F8`. Seguono due chiamate al servizio `0x177FA8`; sotto soglia il ramo di lettura/scrittura è saltato e resta la seconda chiamata. Significato del registro, della soglia e del servizio non attribuiti.
+
+Il [banco CPU](../Python_Trace_Scripts/s33_verify_liveview_return_fe80158_cpu.py) esegue la routine originale con servizio e risultato di `0x1F0980` sostituiti da fixture e MMIO come memoria ordinaria. **5 casi PASS**, 351 istruzioni simulate: `0x1FFFF` lascia `0xFFFF` invariato; `0x20000` trasforma `0xFFFF` in `0xFFFE` e conserva `0xFFFE`; con `0x20001`, `1→0` e `0→0`. Verificati anche numero e primi argomenti delle chiamate al servizio e stack. [Casi e traccia](../Risultati/GUI_S33/liveview_fe80158_cpu_20261029T223858Z/verified_evidence.json).
+
+In un tentativo integrato separato, con `FE80158` sintetico inizializzato a 1, la traccia mostra lettura 1 e scrittura 0. Il ritorno **non completa**: si arresta alla successiva lettura non mappata `0x0FE8014C` a `0x17A8B4`, dopo 586.110 istruzioni simulate. [Evidenza](../Risultati/GUI_S33/liveview_return_bit_probe_cpu_20261029T223906Z/verified_evidence.json), [banco](../Python_Trace_Scripts/s33_verify_gui_liveview_return_bit_probe_cpu.py). Tale valore iniziale e gli altri stati sono imposti dal banco.
+
+La memoria ordinaria non riproduce eventuali effetti collaterali, scritture speciali o timing del registro fisico. Non sono provati ritorno alla live view, display, tasti o scatto. **NON_INSTALLARE**.

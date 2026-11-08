@@ -1,0 +1,9 @@
+# GUI — clipping originale del descrittore di testo
+
+Il 30 ottobre 2026 ho esteso la [prova di copia](S33_GUI_Testo_Copia_Descrittore_CPU_20261030.md) eseguendo le routine originali `0x23AD90` e `0x23B3F8` dopo `0x23AFD8`. Il convertitore restituisce un descrittore sintetico 4×3, mentre il servizio dei limiti fornisce una superficie sintetica 320×240. Il callback grafico finale è una fixture che registra la struttura di clipping e non disegna.
+
+Sono **18 casi PASS**, per ciascuno dei due blocchi lingua: sette etichette a posizione `(12,70)`, un testo zero e una prova aggiuntiva dell'etichetta `ISO` a `(318,70)`. I casi interni arrivano al callback con dimensioni 4×3; al bordo destro la routine originale riduce la larghezza a **2**, lasciando altezza 3. Il campo offset è zero e il puntatore ai dati coincide con il buffer sintetico previsto. I due testi zero non arrivano al callback. Stack e testi sono conservati.
+
+Il banco usa un solo elemento nella lista grafica, il ramo di scala 100 e un descrittore a profondità/campo `+6=1`; convertitore, limiti, metriche e callback finale sono fixture. Le coordinate e la superficie sono ipotesi del banco, non una mappa del display Nikon. L'originale esegue il clipping per questi casi ma **non** il disegno finale, e il descrittore sintetico non prova il formato prodotto dal font reale.
+
+[Verificatore](../Python_Trace_Scripts/s33_verify_gui_text_clipping_cpu.py), [casi](../Risultati/GUI_S33/menu_text_clipping_cpu_20261030T100316Z/cases.json), [manifest e tracce](../Risultati/GUI_S33/menu_text_clipping_cpu_20261030T100316Z/verified_evidence.json), [fixture](../Risultati/GUI_S33/menu_text_clipping_cpu_20261030T100316Z/fixture_patches.json). Le esecuzioni `100249Z` e `100300Z` coprono le posizioni interne; quella finale aggiunge il bordo destro. Font, pixel, hardware e tasti restano da verificare; firmware originale invariato e **NON_INSTALLARE**.

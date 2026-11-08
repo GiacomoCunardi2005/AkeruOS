@@ -1,0 +1,11 @@
+# Mono RAW: nucleo C sperimentale per ARC700
+
+Il 29 ottobre 2026 ho aggiunto [`mono_raw.c`](../AkeruOS/camera/mono_raw.c) e [`mono_raw.h`](../AkeruOS/camera/mono_raw.h), un nucleo isolato che ricostruisce localmente R/G/B da un mosaico assunto RGGB e calcola una luminanza lineare. Usa i parametri del [riferimento offline](S33_Mono_RAW_Frame_Reali_Riferimento_20261029.md): nero 0, bianco di riferimento 4092 e guadagni sperimentali 1,75/1/1,43. I coefficienti sono approssimati in Q16. L'uscita è un campione intero per pixel nelle unità del RAW, senza curva JPEG né clipping a 4092; il sensore mantiene il filtro CFA.
+
+Accetta raster almeno 2×2 con campioni fino a 4095, buffer sorgente e destinazione separati e geometria coerente con le dimensioni allocate dal chiamante. Controlla puntatori nulli, overflow dimensioni, sovrapposizione e campioni fuori intervallo prima di scrivere l'output. Non può verificare la capacità effettiva dei buffer passati dal chiamante. L'output 16 bit può superare 4092 perché i guadagni sono superiori a uno; per tornare alla normalizzazione del riferimento, dividere per 4092.
+
+[`mono_raw_test.c`](../AkeruOS/tests/mono_raw_test.c) usa una matrice sintetica non uniforme 5×5, con bordi e fasi RGGB, confrontata entro un'unità RAW con valori del riferimento scalare Python; verifica anche errori e sovrapposizioni senza scrittura. **Host con UBSan e GNU ARC700 PASS**, 9.942 istruzioni per l'intero test sintetico: [manifest](../Risultati/GUI_S33/akeru_mono_raw_20261029T054950Z/verified_evidence.json). Un primo link è fallito per scelta del libgcc di architettura errata; il verificatore ora seleziona esplicitamente la variante ARC700.
+
+Sul solo host, sei ritagli 16×16 di `DSCo1003` e `DSCo1012` sono confrontati con il riferimento vettoriale indipendente: massimo scarto osservato **0,522 unità RAW** su 1.536 pixel; i bordi sono quelli dei ritagli. [Misure e hash](../Risultati/GUI_S33/akeru_mono_raw_20261029T054950Z/real_crops.json). Ripetizione: `make -C AkeruOS mono-raw-verify`.
+
+Questa è una componente isolata, non collegata al menu, al firmware, al buffer di scatto, alla scrittura o al JPEG. Geometria, CFA fisico e trasformazione colore richiedono calibrazione; non sono dimostrati tempi e memoria su un frame completo ARC, qualità, ownership dei buffer, hardware o sicurezza di integrazione. **NON_INSTALLARE**.

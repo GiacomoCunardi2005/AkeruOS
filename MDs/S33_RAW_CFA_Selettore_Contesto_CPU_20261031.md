@@ -1,0 +1,11 @@
+# S33 V1.1 — selettore CFA nel contesto di scrittura, 31 ottobre 2026
+
+La nuova modalità `--device` del [banco](../Python_Trace_Scripts/s33_verify_cfa_menu_dispatcher_cpu.py) esegue originali il percorso CFA, `0x12BCC4`, `0x18B0BC` e `0x12DE3C`. La fixture si trova a `0x1FA090`; altri servizi di ricerca volume, controlli e lock sono fixture, con handle e memoria sintetici. In sei casi su geometria 4208 × 3152, i [risultati GNU DSP sperimentale](../Risultati/HiddenMenu_RAW/cfa_device_cpu_20261031T204601860312Z/verified_evidence.json) sono PASS: il campo `0x376018+0x5C`, inizializzato dal banco a `0xA5`, vale **1 durante la chiamata** alla fixture e **0 dopo il ritorno**. Il banco verifica puntatore, handle e lunghezza trasmessi; la fixture restituisce il conteggio impostato, senza leggere dati.
+
+Come nella prova precedente, due conteggi completi e quattro brevi sono esercitati; nei quattro casi brevi il dispatcher raggiunge l'errore `0x700103` e prosegue alla chiusura simulata. È il percorso imposto dal banco, non un'osservazione della fotocamera.
+
+Un [banco filesystem precedente e separato](S33_Dumper_RAM_SD_File_FAT_Creazione_Scrittura_Close_e_Riapertura.md) aveva eseguito `0x12DE3C` con selettore 1 e osservato, **nel proprio profilo FAT/controller con DMA modellata**, la selezione del servizio asincrono DEVSD. I due banchi non sono concatenati: la nuova prova CFA non dimostra che quel percorso asincrono venga effettivamente usato per un CFA reale, né che venga creato un header o che il buffer resti valido fino al completamento.
+
+Il primo avvio `cfa_device_cpu_20261031T204554161777Z` non ha eseguito CPU: le mappe fixture si sovrapponevano per il padding. Corretto l'indirizzo della sola fixture, i sei casi passano. Le regressioni [standard](../Risultati/HiddenMenu_RAW/cfa_menu_dispatcher_cpu_20261031T204607819360Z/verified_evidence.json), [geometria](../Risultati/HiddenMenu_RAW/cfa_geometry_cpu_20261031T204607809853Z/verified_evidence.json) e [backend](../Risultati/HiddenMenu_RAW/cfa_backend_cpu_20261031T204607800849Z/verified_evidence.json) sono PASS, sei casi ciascuna. Firmware originale e installazione GNU non modificati. **NON_INSTALLARE**.
+
+Riproduzione: `python3 Python_Trace_Scripts/s33_verify_cfa_menu_dispatcher_cpu.py --device`.

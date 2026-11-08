@@ -1,0 +1,11 @@
+# GUI — routine originale di una voce con etichette sperimentali
+
+Il 29 ottobre 2026 ho eseguito nel simulatore GNU ARC700 la routine originale `0x631F44` **dall'ingresso al ritorno**, su un controllo e un record sintetici. Il campo testo del record passa per `0x6337C4` e, nel ramo raggiunto, il puntatore è inviato come argomento `r4` a `0x186D08`; quest'ultimo è una fixture che registra la chiamata e non disegna.
+
+Sono **16 casi PASS**: tre ID originali (Cambia colore, Impostazioni, Impostazioni fotocamera), quattro puntatori a stringhe sintetiche (ISO, f/, Tempo, Mono RAW) e un campo zero, ripetuti con blocchi lingua italiano e inglese. In ciascuno dei 14 casi non nulli la fixture riceve il puntatore atteso una volta; nei due casi zero non viene chiamata. La traccia verifica ingresso, lookup e chiamata al servizio e lo stack torna al valore iniziale.
+
+Rispetto alla [prova precedente a frammenti](S33_GUI_Etichette_Record_Frammenti_CPU_20261029.md), la CPU percorre ora anche il codice intermedio e le sue guardie per questo contesto. Le metriche delle icone, il disegno delle icone, la scelta colore, l'impostazione testo e il servizio testo sono sostituiti in laboratorio; il controllo è impostato con indice 0 e flag 0. Non si generalizza l'esito a tutti i rami della routine.
+
+[Verificatore](../Python_Trace_Scripts/s33_verify_gui_full_item_text_cpu.py), [casi](../Risultati/GUI_S33/menu_text_full_control_cpu_20261029T225337Z/cases.json), [manifest e tracce](../Risultati/GUI_S33/menu_text_full_control_cpu_20261029T225337Z/verified_evidence.json), [fixture](../Risultati/GUI_S33/menu_text_full_control_cpu_20261029T225337Z/fixture_patches.json). Il primo tentativo `225320Z` si è fermato sulla lettura non mappata `0x681B69`; nei successivi il banco ha mappato il relativo byte come zero sintetico. Il run `225325Z` è passato ma il suo report chiamava ancora l'ingresso “fragments”; quello finale corregge la descrizione dei risultati.
+
+La routine non dimostra che il font disegni i caratteri, che gli indirizzi siano validi sulla macchina o che la voce sia visibile; gli indirizzi e il contesto sono sintetici, e la memoria dei testi deve restare valida. Non sono verificati tasti fisici, framebuffer, lingua runtime o lifecycle del menu. Firmware e dispositivo originali non modificati; **NON_INSTALLARE**.

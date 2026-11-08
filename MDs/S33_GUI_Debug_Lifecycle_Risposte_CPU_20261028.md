@@ -1,0 +1,11 @@
+# S33 V1.1 — risposte diagnostiche agli eventi di ingresso
+
+Il 28 ottobre 2026 ho eseguito in GNU ARC700 i wrapper originali delle schermate diagnostiche `DebugModeExpTime` (`0x7D22F0`) e `DebugModeISO` (`0x7D252C`), con gli eventi `0x4401` e `0x4403` iniettati direttamente. Dispatcher, fallback e tabelle locali e comuni sono originali, così come i dati iniziali dei filtri. Il chiamante, il contesto e il descrittore precedente sono sintetici; non sono usati servizi sostitutivi nel percorso provato.
+
+In **quattro casi PASS**, entrambe le schermate restituiscono **0** per entrambi gli eventi. Le tabelle locali e comune non contengono quelle due chiavi; il dispatcher locale passa al fallback `0x20E814`, il cui dispatcher sulla tabella comune termina senza callback. Le istruzioni e le tabelle sono confrontate con `DUMPS/MainCode.dmp`; il banco usa i filtri iniziali, non uno stato runtime misurato.
+
+Il banco passa poi ciascuno zero alla routine originale `0x14510C`, con tabella oggetti originale e descrittore precedente sintetico. L'elemento iniziale della tabella per ID 0 è nullo: nei quattro casi l'interprete restituisce stato 1 e destinazione nulla. **Zero non equivale alla risposta `−1`** che può proporre il descrittore precedente nel [banco precedente](S33_GUI_WindowManager_Transizioni_CPU_20261028.md). Questa seconda chiamata è diretta: `0x145180` usa l'interprete dopo `0x4403`, ma il banco non sostiene che usi la risposta di `0x4401` nello stesso modo.
+
+Questa prova collega il valore restituito dal codice diagnostico all'interprete, ma non esegue una transizione `0x145180` completa, il dispatcher di invio `0x169D78`, i callback `0x4405`, il display o la fotocamera. Non prova quale stato della tabella, dei filtri o dei descrittori sia presente sulla macchina, né cambia la richiesta esplicita `(0x36,0)` in uscita dalle schermate diagnostiche. Nessuna modifica a firmware, GNU, hardware o SD; **NON_INSTALLARE**.
+
+[Verificatore](../Python_Trace_Scripts/s33_verify_gui_debug_lifecycle_cpu.py), [quattro casi](../Risultati/GUI_S33/debug_lifecycle_cpu_20261028T090918Z/cases.json), [traccia](../Risultati/GUI_S33/debug_lifecycle_cpu_20261028T090918Z/cases.trace) e [risultato con hash](../Risultati/GUI_S33/debug_lifecycle_cpu_20261028T090918Z/verified_evidence.json).

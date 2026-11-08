@@ -1,0 +1,15 @@
+# S33 V1.1 — eventi quando ISO è il descrittore corrente
+
+**Data:** 2026-10-31. Prova GNU ARC700 su stato e servizi sintetici, senza fotocamera.
+
+Partendo dal [banco di ritorno ISO](S33_GUI_Coda_Ritorno_ISO_Manager_CPU_20261031.md), il banco attiva la coda AkeruOS per l'apertura ISO, verifica che il descrittore corrente sia quello originale `0x989FCC`, imposta **controllo attivo nullo** e consegna uno degli eventi logici al dispatcher originale `0x169E1C`, seguito dal relativo rilascio. Verifica con contatore separato che il callback del descrittore esposizione sintetico non sia entrato e che la coda del modello resti sospesa e vuota.
+
+Nei sei casi PASS, `0x580/581`, `0x700/701`, `0x2180/2181` e `0x2700/2701` raggiungono il callback ISO originale `0x7D252C`; il dispatcher restituisce 1 per pressione e rilascio. I primi due eventi sono ripetuti in più scenari. Il banco non dimostra l'identità fisica o la polarità dei tasti, né che il controllo nullo rappresenti lo stato effettivo di ISO. Un ritorno 1 non prova di per sé disegno, acquisizione o assenza di altri effetti.
+
+Nel caso `0x2180`, il percorso comune originale `0x20E940` arriva al sito `0x20EA46`, che prepara richiesta verso ID `0x87` con argomento 0. Qui il banco sostituisce in **copia laboratorio** le istruzioni di preparazione e chiamata con una fixture che riproduce gli argomenti, li registra e **sopprime l'apertura**. Il descrittore rimane ISO nella prova proprio perché la richiesta è intercettata: non è prova che rimarrebbe ISO se la transizione fosse eseguita. Questa ricaduta dimostra che la sola sospensione della coda non basta a gestire ogni possibile destinazione successiva; occorre osservare il lifecycle reale e prevedere anche uscite diverse dal ritorno al modello. Nei casi provati con `0x580`, `0x700` e `0x2700` quella fixture non è raggiunta; ciò non esclude altri effetti o altre condizioni.
+
+Dopo questa fase il banco ripristina il controllo sintetico e continua le sei verifiche ISO/Exit, rifiuto del ritorno e riconferma già descritte nel rapporto precedente. La pressione è consegnata dal banco, non dallo scheduler; selezione, filtro, lifecycle, risorse e vari servizi sono fixture. Il contesto e il descrittore AkeruOS rimangono sintetici e il collegamento non è installabile.
+
+Riproduzione: `python3 Python_Trace_Scripts/s33_verify_gui_iso_modal_dispatch_cpu.py`; [casi](../Risultati/GUI_S33/iso_modal_dispatch_cpu_20261031T210632Z/cases.json), trace, snapshot e fixture nella stessa cartella. Regressioni PASS: sei casi ritorno/coda `model_iso_return_queue_cpu_20261031T210639Z/` e controllo statico registri input `input_registers_20261031T210639Z/`.
+
+Tentativi conservati: `...210505Z` FAIL per ricorsione del dispatcher con controllo attivo sintetico non costruito; `...210520Z` FAIL con controllo nullo quando `0x2180` raggiunge una lettura MMIO non mappata durante la transizione non intercettata. Non sono prove di guasti fisici. La fixture del risultato PASS delimita l'esecuzione prima dell'apertura e non inventa valori MMIO. Nessuna operazione sulla fotocamera o SD; **NON_INSTALLARE**.

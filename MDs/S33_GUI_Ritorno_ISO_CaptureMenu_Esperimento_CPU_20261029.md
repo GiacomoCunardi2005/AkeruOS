@@ -1,0 +1,16 @@
+# S33 V1.1 — esperimento di ritorno ISO al menu di ripresa
+
+Il 29 ottobre 2026 ho eseguito una prova di fattibilità in una copia di laboratorio: nel callback originale di conferma ISO `0x7D25B0`, l'istruzione a `0x7D25E6` che prepara l'ID di ritorno viene cambiata da `mov_s r0,0x36` a `mov_s r0,2` (byte `36 d8 → 02 d8`). Il valore 2 identifica il `CaptureMenu` originale, non il nuovo sottomenu esposizione richiesto. La modifica è limitata alla copia usata dal banco; non è un firmware installabile. Sarebbe globale per tutte le uscite di quel callback, anche quando la schermata è aperta da un altro contesto.
+
+Il banco riprende la prova [precedente](S33_GUI_ISO_Tasto_Conferma_Ritorno_CPU_20261028.md): tasto logico 11 iniettato → coda → dispatcher originale → apertura diagnostica ISO con WindowManager → scelta sintetica → callback di conferma e nuova apertura. Nella prova precedente l'uscita richiedeva `0x36` e il descrittore finale era `0x987AF8` (`DEBUG MODE MENU`). Con la modifica di laboratorio, e con i servizi di lifecycle sottostanti sostituiti, il descrittore finale osservato è `0x9802AC` (`CaptureMenu`).
+
+| Selezione sintetica | Campi ISO dopo conferma: diagnostico / indice / valore | Descrittore dopo l'apertura nel banco |
+|---|---|---|
+| ISO 125 | 6 / 6 / 125 | `0x9802AC` |
+| Exit | 88 / 77 / 555, sentinelle iniziali invariate | `0x9802AC` |
+
+Due casi PASS, 23.775 istruzioni nel modello, stack conservato. [Verificatore](../Python_Trace_Scripts/s33_verify_gui_iso_return_capture_candidate_cpu.py), [casi](../Risultati/GUI_S33/iso_return_capture_candidate_cpu_20261028T232619Z/cases.json), [manifest e traccia](../Risultati/GUI_S33/iso_return_capture_candidate_cpu_20261028T232619Z/verified_evidence.json), [modifiche di laboratorio e fixture](../Risultati/GUI_S33/iso_return_capture_candidate_cpu_20261028T232619Z/fixture_patches.json). Il WindowManager originale è eseguito ma i callback lifecycle di CaptureMenu `0x7CAFE8` e della lista `0x631674` sono **fixture che ritornano zero**; anche altri servizi GUI e il controllo sono sintetici. Il descrittore finale non prova che il menu sia inizializzato, visualizzato o utilizzabile.
+
+Le esecuzioni iniziali sono conservate come **FAIL**, non come GUI funzionante: [232551Z](../Risultati/GUI_S33/iso_return_capture_candidate_cpu_20261028T232551Z/) si ferma sulla lettura non mappata `0xC8EC7D` durante l'inizializzazione di una risorsa; [232557Z](../Risultati/GUI_S33/iso_return_capture_candidate_cpu_20261028T232557Z/) con memoria sintetica aggiunta arriva a una lettura MMIO non modellata `0x0FED2018`. Nella prova PASS sono sostituiti gli handler lifecycle, per cui questi servizi non sono dimostrati. I test con fixture non dimostrano che mappare quei valori sia corretto sulla camera.
+
+L'esperimento identifica una possibilità locale e il costo di integrazione, non una soluzione pronta: servono un menu esposizione proprio, un ritorno contestuale che non alteri altri accessi alla diagnostica, ciclo di vita e risorse reali, gestione dell'annullo, concorrenza e verifiche per tempo e f/. Non sono dimostrati tasti fisici, GUI visibile, AE, scatto, persistenza o hardware. Nessun file firmware originale, fotocamera o SD modificato. **NON_INSTALLARE**.

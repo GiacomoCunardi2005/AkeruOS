@@ -1,0 +1,11 @@
+# GUI — chiamante originale e riga corta non allineata
+
+Il 30 ottobre 2026 ho eseguito nel simulatore GNU ARC700 il chiamante originale `0x2C8170` insieme alla routine di riga originale `0x2C8E4C`. Il banco inizializza direttamente una struttura di clipping sintetica con larghezza **1**, offset **3** e altezza 1, e seleziona `0x2C8E4C` nella cella usata dal chiamante. I servizi di dimensioni e acquisizione buffer sono fixture; il modello DSP è sperimentale.
+
+La traccia mostra che il chiamante copia larghezza 1 e offset 3 nella struttura di riga e invoca `0x2C8E4C`, che legge effettivamente quei due valori. Con sorgente sintetica `0xFF` e destinazione mappata a soli 8 byte, la routine scrive tutti gli 8 byte e tenta la scrittura successiva fuori dalla regione, provocando il **fault atteso** nel simulatore. Il PASS del probe significa che il comportamento indesiderato è stato riprodotto e controllato, non che il percorso sia sicuro.
+
+Questo collega il chiamante alla [precedente prova isolata](S33_GUI_Un_Bit_Offset_Clipping_CPU_20261030.md). Il clipping originale che produce gli stessi valori era stato verificato in una prova separata; qui è il banco a impostarli direttamente. Restano quindi da collegare clipping e chiamante nella stessa esecuzione e da stabilire condizioni, capacità e comportamento sulla macchina fisica. Non è dimostrato un overflow hardware.
+
+**Seguito:** la [prova integrata successiva](S33_GUI_Clipping_Riga_Catena_CPU_20261030.md) esegue clipping, selezione e chiamante originali nella stessa esecuzione sintetica e riproduce il fault; l'effetto hardware resta non verificato.
+
+[Verificatore](../Python_Trace_Scripts/s33_probe_gui_mono_scanline_caller_cpu.py), [manifest e traccia](../Risultati/GUI_S33/mono_scanline_caller_probe_cpu_20261030T100745Z/verified_evidence.json), [fixture e modifiche delle copie laboratorio](../Risultati/GUI_S33/mono_scanline_caller_probe_cpu_20261030T100745Z/fixture_patches.json). Il primo tentativo `100703Z` si è fermato nella preparazione perché due fixture sovrapponevano i byte degli ingressi adiacenti; il banco finale usa un salto di laboratorio separato. Nessun firmware originale o dispositivo modificato; **NON_INSTALLARE**.

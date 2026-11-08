@@ -1,0 +1,11 @@
+# S33 V1.1 — produttore candidato del byte del marcatore
+
+28 ottobre 2026. Tre casi offline nel simulatore GNU ARC700 con RAM sintetica; **NON_INSTALLARE**.
+
+Il frammento originale `0xDB732..0xDB746` chiama `0x18C868`, che restituisce **10**, e salva il byte basso a offset 928 dell'indirizzo restituito dalla funzione puntata da `r14`. Nella prova il banco assegna direttamente a `r14` il getter originale `0xF6F14`, che restituisce `0x380574`. La scrittura arriva quindi a `0x380914`. Subito dopo, il banco richiama artificialmente il frammento originale `0x1B8F82 → 0xDF304`: questo legge lo snapshot e porta 10 nel byte `0x36879C`, che sceglie il ramo del marcatore. Tre valori iniziali sintetici 0, 11 e 202 diventano tutti 10; i due byte adiacenti controllati rimangono invariati.
+
+Nel codice originale `0xDB240` carica `r14` da un letterale con indirizzamento PC relativo scalato; la cella effettiva `0xDB0E4` contiene `0xF6F14`. Il collegamento dal caricamento al frammento rimane condizionato alla raggiungibilità e alla conservazione del registro lungo il percorso reale: la prova CPU **imposta** `r14` e invoca direttamente i frammenti. Alcuni commenti del disassemblaggio lineare non rendono correttamente l'indirizzo scalato: la cella è verificata sui byte originali.
+
+Per il valore 10, il successivo confronto con `0x0B` sceglierebbe il ramo ordinario del marcatore, con dimensioni 4208×3152 precedentemente analizzate, se il valore non fosse cambiato e il gate fosse raggiunto. Non è una misura dello stato della fotocamera, non esclude altri scrittori o aggiornamenti concorrenti e non prova che il percorso sia quello del recente scatto. Il marcatore e il writer non sono eseguiti in questo banco.
+
+Riproduzione: `python3 Python_Trace_Scripts/s33_verify_raw_marker_context_producer_cpu.py`. [Casi](../Risultati/Mono_RAW/raw_marker_context_producer_cpu_20261028T150342Z/cases.json), [fixture](../Risultati/Mono_RAW/raw_marker_context_producer_cpu_20261028T150342Z/fixture_patches.json), [script](../Python_Trace_Scripts/s33_verify_raw_marker_context_producer_cpu.py). Un trampolino arresta il produttore dopo lo store, un altro interrompe il getter dopo il primo campo; un servizio intermedio è simulato. Nessuna SD, fotocamera, frame o file reale è coinvolto.

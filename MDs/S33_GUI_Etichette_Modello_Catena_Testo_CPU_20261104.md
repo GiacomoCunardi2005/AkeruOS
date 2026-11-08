@@ -1,0 +1,9 @@
+# Etichette del modello nella catena testuale Nikon — CPU emulata
+
+Il 4 novembre 2026 il banco GNU ARC700 chiama `akeru_menu_label` compilata dal codice AkeruOS per ciascuna delle sei schermate e quattro posizioni logiche. Inserisce il puntatore restituito in un record sintetico e invoca esplicitamente la routine originale della voce `0x631F44`, seguendo la catena originale `0x186D08 → 0x186C40 → 0x186B14` fino a un callback di disegno sostituito da un registratore.
+
+**48/48 casi PASS:** 24 posizioni per ciascuno dei blocchi lingua italiano e inglese mappati nel banco. Le 19 posizioni con etichetta per lingua arrivano al registratore con il puntatore e il contenuto attesi; le cinque vuote non chiamano il servizio testuale. Per ogni caso è controllato anche lo stack. Le stringhe del modello sono italiane in entrambi i contesti: la prova non realizza traduzioni automatiche. È un collegamento creato dal banco, non dal runtime della fotocamera.
+
+I byte delle finestre originali sono confrontati con il dump; controllo, record, contesto, metriche, misura e disegno glifi sono fixture. Il disegnatore originale dei caratteri non è eseguito, quindi non sono provati pixel, font, leggibilità, spazio sullo schermo o display. Le posizioni A/B non corrispondono ancora a valori f/ verificati; indirizzi e RAM sono sintetici. Nessun tasto fisico, lifecycle, sensore, salvataggio o hardware verificato. **NON_INSTALLARE**.
+
+Riproduzione: `python3 Python_Trace_Scripts/s33_verify_gui_item_text_chain_cpu.py --model-labels`. [Evidenze e limiti](../Risultati/GUI_S33/menu_model_text_chain_cpu_20261104T161546Z/verified_evidence.json), [casi](../Risultati/GUI_S33/menu_model_text_chain_cpu_20261104T161546Z/cases.json). La regressione senza opzione conserva i 16 casi storici: [PASS](../Risultati/GUI_S33/menu_text_chain_cpu_20261104T161546Z/verified_evidence.json).

@@ -1,0 +1,9 @@
+# Modello colore e nucleo Mono RAW
+
+Il 29 ottobre 2026 ho collegato in un componente C isolato le azioni `AKERU_REQUEST_COLOR` e `AKERU_REQUEST_MONO` del [modello GUI](S33_GUI_Prototipo_Navigazione_20261029.md) al [nucleo RAW monocromatico](S33_Mono_RAW_Ottimizzazione_Divisioni_20261029.md). [`color_mode.c`](../AkeruOS/camera/color_mode.c) mantiene la modalità in una variabile posseduta dal chiamante: le due richieste la aggiornano, altre azioni non la cambiano.
+
+La funzione di elaborazione riceve la modalità **per valore**, come copia scelta dal chiamante per un frame. In modalità standard restituisce 0 senza toccare il buffer: il chiamante deve proseguire sul percorso colore. In modalità mono chiama il nucleo RAW e restituisce 1 solo se ha prodotto l'uscita, oppure -1 su input invalido. Modalità invalide sono rifiutate. Questa interfaccia non implementa né invoca la pipeline colore Nikon; inizializzazione della modalità, acquisizione della copia e sincronizzazione sono responsabilità del futuro chiamante.
+
+Il [test](../AkeruOS/tests/color_mode_test.c) attraversa gli eventi modello per aprire colore e scegliere mono, copia la modalità, torna a standard e verifica che la copia mono produca quattro valori 1219 da campioni 1024; verifica anche la direzione opposta, il passaggio standard senza scritture, azioni estranee e input invalidi. **Host UBSan e GNU ARC700 PASS**: [manifest](../Risultati/GUI_S33/akeru_color_pipeline_20261029T224350Z/verified_evidence.json). Ripetizione: `make -C AkeruOS color-pipeline-verify`.
+
+Questa è una connessione software isolata, con eventi e frame sintetici, non ancora collegata al firmware, acquisizione, buffer reali, salvataggio, JPEG o display. La copia per valore protegge da modifiche successive solo se il chiamante la acquisisce e sincronizza correttamente; persistenza e concorrenza non sono implementate. Il CFA fisico resta presente e i coefficienti non sono calibrati. **NON_INSTALLARE**.

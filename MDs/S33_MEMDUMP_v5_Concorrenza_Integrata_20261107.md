@@ -1,0 +1,7 @@
+# MEMDUMP v5: tentativo di scrittura concorrente nel modello
+
+Il 7 novembre 2026 `python3 Python_Trace_Scripts/s33_verify_memdump_held_v5.py --rival` ha verificato il candidato v5 effettivo, SHA-256 `a0e4a4eeb6a4744cc462c8678e8903b9f372787350d2ea3bd992919942446948`, sul percorso hook, task, diagnostico e FAT sintetica. La prova integra quella precedente sull'adattatore separato, documentata in [versione 5](S33_MEMDUMP_Versione5_Handle_Esclusivo_20261106.md).
+
+Fra la prima e la seconda scrittura, il banco invoca direttamente il wrapper Nikon `0x12BD5C` sullo stesso percorso `B:\\MEMDUMP.BIN`. Il tentativo è rifiutato con `0x01A00012`: il primo wrapper resta vivo, wrapper e oggetto rivali sono rilasciati e tutti i 35.302 settori sintetici sono invariati durante il tentativo. Il task riprende e conclude il file da 17.041.228 byte; verifica della porzione DMA catturata, singola chiusura e `fsck.fat -n` passano. [Evidenza e traccia](../Risultati/Runtime_Kernel/MEMDUMP_V5_Rival_FAT/20261107T020824918754Z/evidence.json). La regressione v6 su volume grande è [PASS](../Risultati/Runtime_Kernel/MEMDUMP_V6_Hook_Large_FAT/20261107T020858207913Z/evidence.json).
+
+L'invocazione è intercalata dal banco senza cambio task effettivo; secondo wrapper e oggetto sono fixture. Non prova altri interleaving, scheduler reale o esclusività di altri backend e non dimostra atomicità del dump. Boot, SD fisica, mappa RAM completa e recupero non sono verificati da questo test. **NON_INSTALLARE.**

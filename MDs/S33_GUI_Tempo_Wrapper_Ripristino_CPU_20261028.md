@@ -1,0 +1,9 @@
+# GUI V1.1 — wrapper del ripristino tempo, 28 ottobre 2026
+
+Quattro sequenze GNU ARC700 estendono la [prova del chiamante](S33_GUI_Tempo_Chiamante_Ripristino_CPU_20261028.md). Dopo la conferma diagnostica e il setter concorrente, il banco scrive il byte sintetico `4` a `0x681FC0` e invoca il wrapper originale `0x65BA94`. Quest'ultimo chiama il getter originale `0x65DB54`, che legge il byte e restituisce 4, poi passa tale risultato a `0x65BC60`: questo costruisce il record tramite `0xCA5DC` e invoca `0xCA654`.
+
+Nei quattro casi il campo `0x37FBF4`, dopo i setter, vale rispettivamente 0, 1.000.000, 121.000 (input rifiutato) e 500.000. Il successivo percorso ripristina il record temporaneo e il campo a 121.000 usando la word diagnostica nonzero. Il record viene osservato da una fixture prima del rilascio dello stack; `0x17C480` è una fixture che restituisce 90.000. Il test verifica quattro letture del byte 4 nella traccia, i campi, il record, i ritorni e lo stack.
+
+PASS: 69.546 istruzioni nel modello; finestre esaminate e letterale del getter confrontati col dump V1.1. [Verificatore](../Python_Trace_Scripts/s33_verify_gui_time_confirm_wrapper_restore_cpu.py), [casi](../Risultati/GUI_S33/time_confirm_wrapper_restore_cpu_20261028T142905Z/cases.json), [manifest e traccia](../Risultati/GUI_S33/time_confirm_wrapper_restore_cpu_20261028T142905Z/verified_evidence.json), [fixture](../Risultati/GUI_S33/time_confirm_wrapper_restore_cpu_20261028T142905Z/fixture_patches.json).
+
+Il banco impone byte 4, invocazione del wrapper e ordine dei setter. I servizi `0xDD078`, `0x14941C` e `0xDE574` chiamati dal wrapper sono fixture, così come getter dello snapshot, altri servizi e GUI; DSP GNU v7 sperimentale. Non è verificato chi scriva il byte in una sessione reale, quando il wrapper venga chiamato, né lo scatto, l'unità fisica o la persistenza. La GUI desiderata resta da costruire. **NON_INSTALLARE**.

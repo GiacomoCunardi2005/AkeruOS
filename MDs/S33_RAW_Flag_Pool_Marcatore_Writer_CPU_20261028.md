@@ -1,0 +1,11 @@
+# S33 V1.1 — flag RAW, pool, marcatore e writer nello stesso banco
+
+28 ottobre 2026. Una sequenza GNU ARC700 con modello DSP sperimentale esegue il produttore di stato e il pool originali, poi il frammento originale `0x1B91EC` fino alla chiamata del writer. **NON_INSTALLARE**.
+
+Il banco impone stato sintetico `0x0A`, pool inattivo e selettore pool 0, imposta flag RAW 1 e selettore RAW 3 e prepara il descrittore con il primo nodo del pool. Il frammento legge il flag, chiama il marcatore originale `0x28D5BC`, poi raggiunge il writer, sostituito da una fixture che registra gli argomenti. La traccia verifica l'ordine marcatore → writer. Il writer riceve il primo indirizzo dati e una richiesta di **26.527.232 byte**.
+
+La distanza sintetica fra i primi due nodi è **13.263.872 byte**. I 32 bit bersaglio inizialmente opposti alla tabella provocano 32 byte cambiati dal marcatore: uno prima dell'inizio del secondo nodo e 31 dopo. È stata confrontata l'intera area sintetica mappata dal primo nodo oltre l'ultimo bersaglio. La fixture writer non legge i 26 MB e non scrive file; si arresta la sequenza prima della continuazione originale, con ripristino dello stack effettuato dal banco.
+
+La prova collega flag, marcatore e argomenti del writer nello stesso modello: non dimostra che quelle condizioni si verifichino su hardware, che il secondo nodo sia attivo o che la regione fisica abbia tale disposizione. Non prova CFA, purezza, capacità reale, persistenza o stesso scatto del JPEG. L'evento HiddenMenu e l'acquisizione non vengono eseguiti in questa sequenza; i valori sono impostati dal banco. Il candidato [RAW forzato](../BINs/RAW_12bit_e_CFA_IRP_forzati_NON_INSTALLARE/LEGGIMI.md) continua a forzare le letture 1/3, ma questa prova usa getter originali e RAM sintetica, non il BIN candidato.
+
+Riproduzione: `python3 Python_Trace_Scripts/s33_verify_raw_pool_flag_marker_writer_cpu.py`. [Casi](../Risultati/Mono_RAW/pool_flag_marker_writer_cpu_20261028T145700Z/cases.json), [fixture](../Risultati/Mono_RAW/pool_flag_marker_writer_cpu_20261028T145700Z/fixture_patches.json), [script](../Python_Trace_Scripts/s33_verify_raw_pool_flag_marker_writer_cpu.py). Firmware originale e GNU non modificati. La precedente esecuzione PASS `145652Z` precede l'aggiunta dell'assert sull'ordine in traccia.

@@ -1,0 +1,7 @@
+# MEMDUMP: confronto della tabella regioni nel dump hardware
+
+Il 7 novembre 2026 `python3 Python_Trace_Scripts/s33_verify_memdump_runtime_regions.py` ha confrontato il [dump reale v5](S33_MEMDUMP_Primo_Dump_Hardware_20261106.md), SHA-256 `c91888b23a8def81dc0afbf5a62a6210361308fea030bfbafcf6a43338286107`, con il modello della [tabella applicativa](S33_NAND_PC_Regioni_RAM_Applicative_e_Limite_Installazione.md). Il dump non è atomico.
+
+Tutti i 111 record a `0x3766F4` coincidono con il calcolo precedente per ID, parent, base, lunghezza e allineamento. Il conteggio runtime è 111 e il minimo software è `0x01BF9800`; tutte le basi dei record sono oltre la fine del dump `0x0104074C`. Nove record hanno il campo stato a 1; tra questi il record 71 descrive base `0x03B04800`, dimensione `0x00665800`. L'interpretazione operativa del campo stato e la disponibilità degli intervalli non sono dedotte dal solo valore. [Evidenza completa](../Risultati/Runtime_Kernel/MEMDUMP_Runtime_Regions_20261107/evidence.json).
+
+Questo conferma che il layout software calcolato nel modello compare nel dump acquisito dalla fotocamera, non che i byte descritti siano presenti nel dump, RAM fisica distinta o leggibili sequenzialmente. In particolare non risolve alias, buchi o MMIO, né autorizza a dichiarare completa una cattura. La mappa fisica necessaria all'obiettivo di dump completo resta aperta; **NON_INSTALLARE**.

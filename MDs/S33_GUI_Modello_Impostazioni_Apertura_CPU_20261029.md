@@ -1,0 +1,9 @@
+# Apertura impostazioni dal modello — prova CPU
+
+Il 29 ottobre 2026 ho proseguito il [tentativo precedente](S33_GUI_Modello_Impostazioni_Apertura_Tentativo_CPU_20261029.md), aggiungendo aree RAM e MMIO sintetiche al banco. La sequenza tasto logico 78 → coda originale → evento `0x2700` consegnato dal banco al modello C → richiesta impostazioni → chiamata originale `0x1453E4(0xB7,1)` ora restituisce 1 e lascia corrente il descrittore originale `GeneralSetupMenu` `0x99242C`.
+
+[Un caso PASS](../Risultati/GUI_S33/model_open_settings_cpu_20261029T053239Z/verified_evidence.json), 19.812 istruzioni: controllati azione del modello, descrittore, evento di stato 1 e controparte stato 0, ritorno e stack. La controparte stato 0 è estratta dalla coda, non inviata al manager. Il callback originale `0x7EA958` è raggiunto, ma non è dimostrata una schermata utilizzabile. [Casi](../Risultati/GUI_S33/model_open_settings_cpu_20261029T053239Z/cases.json), [traccia](../Risultati/GUI_S33/model_open_settings_cpu_20261029T053239Z/cases.trace), [fixture](../Risultati/GUI_S33/model_open_settings_cpu_20261029T053239Z/fixture_patches.json) e [banco](../Python_Trace_Scripts/s33_verify_gui_model_open_settings_cpu.py).
+
+L'aggiunta del blocco sintetico zero `0x1040500` consente la lettura a `0x187204`; la traccia conferma zero. I seed MMIO `0x0FEF0020=0x00A4` e `0x0FED3800=8` sono anch'essi letti con i valori previsti. Queste sono condizioni del simulatore, non misure del dispositivo. Altre aree MMIO e RAM, servizi, controllo attivo e stato del manager sono fixture; il DSP è sperimentale.
+
+Il modello è chiamato direttamente dal banco, che traduce l'azione in apertura: non è un'integrazione nel firmware. Non sono verificati il disegno, il recapito dei tasti fisici, la navigazione dentro le impostazioni, il ritorno al nuovo menu o la persistenza delle modifiche. Firmware originale, fotocamera e SD non modificati; **NON_INSTALLARE**.

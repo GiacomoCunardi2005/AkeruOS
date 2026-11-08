@@ -1,0 +1,11 @@
+# S33 V1.1 — ingresso diagnostico tramite WindowManager in CPU
+
+Il 28 ottobre 2026 ho eseguito in GNU ARC700, per le schermate ISO e tempo, il gestore originale `0x145180` con i descrittori e la tabella oggetti iniziali V1.1. In entrambi i casi parte senza schermata precedente, con contesto del gestore e hook sintetici. Il gestore invia `0x4403` attraverso `0x169D78`, `0x16A6E4` e `0x16A028` originali al wrapper diagnostico originale; questo usa i dispatcher e le tabelle originali. Il risultato viene interpretato da `0x14510C` nello stesso percorso CPU.
+
+I **due casi PASS** terminano con ritorno 1 del gestore e rispettivamente il descrittore tempo `0x989CD8` o ISO `0x989FCC` nel puntatore corrente. Nei casi di banco vengono inoltre registrati un evento `0x4401` e un evento `0x4405` per schermata. Questo estende la [prova precedente](S33_GUI_Debug_Lifecycle_Risposte_CPU_20261028.md), che chiamava wrapper e interprete separatamente.
+
+Per delimitare il test, il recupero controllo, i gestori degli eventi `0x4401` e `0x4405` e due servizi finali di disegno sono fixture. In particolare **il gestore simulato di `0x4405` restituisce `−2`**: il successo osservato non dimostra l'inizializzazione reale o la visualizzazione della schermata. Il contesto, l'assenza del precedente e lo stato della tabella sono condizioni del banco, non misure della fotocamera. Restano da verificare i callback e le risorse effettive, il ritorno al nuovo menu, i pulsanti fisici e lo scatto.
+
+Codice e descrittori originali sono confrontati con `DUMPS/MainCode.dmp`; la traccia controlla l'esecuzione del percorso principale e lo stack. Il tentativo `091101Z` è conservato come FAIL: le fixture per `0x4401/0x4405` erano associate a handler errati e l'esecuzione ha raggiunto un servizio non mappato; corrette le associazioni, `091116Z` è PASS. Non è stato modificato il firmware per aggirare l'emulatore; **NON_INSTALLARE**.
+
+[Verificatore](../Python_Trace_Scripts/s33_verify_gui_debug_window_entry_cpu.py), [due casi](../Risultati/GUI_S33/debug_window_entry_cpu_20261028T091116Z/cases.json), [fixture](../Risultati/GUI_S33/debug_window_entry_cpu_20261028T091116Z/fixture_patches.json), [traccia](../Risultati/GUI_S33/debug_window_entry_cpu_20261028T091116Z/cases.trace), [risultato e hash](../Risultati/GUI_S33/debug_window_entry_cpu_20261028T091116Z/verified_evidence.json).

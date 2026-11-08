@@ -1,0 +1,9 @@
+# GUI — copia del descrittore grafico del testo
+
+Il 30 ottobre 2026 ho esteso la [prova di dispatch](S33_GUI_Testo_Dispatch_Grafico_CPU_20261029.md) eseguendo anche la routine originale `0x23AFD8`. Il convertitore rimane una fixture e restituisce un descrittore sintetico 4×3, con campo `+6` uguale a 1 e byte `+8` uguale a 0. Il servizio di scala è forzato a 100 e la routine finale `0x23AD90` è un registratore, senza disegno di pixel.
+
+**16 casi PASS**, sette etichette non nulle e un campo zero per ciascuno dei blocchi lingua inglese e italiano. Nei 14 casi non nulli il convertitore riceve il puntatore al testo e le coordinate sintetiche `(12,70)`; `0x23AFD8` copia il descrittore e passa alla fixture finale le stesse coordinate, il valore 1 e un puntatore distinto da quello originale. Il banco verifica nel descrittore copiato le dimensioni 4×3 e il campo `+6` pari a 1. I due casi zero non chiamano il disegnatore. Stack e stringhe sono conservati.
+
+[Verificatore](../Python_Trace_Scripts/s33_verify_gui_text_descriptor_copy_cpu.py), [casi](../Risultati/GUI_S33/menu_text_descriptor_copy_cpu_20261030T100148Z/cases.json), [manifest e tracce](../Risultati/GUI_S33/menu_text_descriptor_copy_cpu_20261030T100148Z/verified_evidence.json), [fixture](../Risultati/GUI_S33/menu_text_descriptor_copy_cpu_20261030T100148Z/fixture_patches.json). La prima esecuzione `100130Z` verificava le dimensioni; quella finale verifica anche il puntatore distinto e il campo `+6`.
+
+La copia osservata riguarda questa configurazione sintetica e una sola parte del descrittore; non dimostra il formato prodotto dal convertitore reale né la durata di eventuali dati puntati. Conversione dei glifi, `0x23AD90`, font, display, tasti e RAM fisica restano da verificare. Nessuna modifica a firmware o dispositivo; **NON_INSTALLARE**.

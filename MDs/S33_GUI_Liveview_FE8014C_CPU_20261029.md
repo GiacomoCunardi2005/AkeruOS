@@ -1,0 +1,9 @@
+# Live view: accesso mascherato a FE8014C
+
+Il 29 ottobre 2026 ho seguito l'accesso successivo al [registro FE80158](S33_GUI_Liveview_FE80158_CPU_20261029.md). Il codice di ritorno entra nel servizio originale `0x177FA8`, che attraverso le tabelle e `0x17A3F4` chiama il wrapper originale `0x17A8A4` con destinazione `0x0FE8014C`. Il wrapper applica una maschera alla halfword; una [prova CPU precedente](S33_Registri_MMIO_Rimanenti_e_Vettori_20261025.md) ne aveva già verificato isolatamente la formula su memoria sintetica: `(vecchio & ~maschera) | (maschera & valore)`.
+
+Nel nuovo banco integrato, la cella sintetica viene inizializzata a `0xA55A`. La traccia registra una prima chiamata con maschera `0x2000` e valore zero, che produce `0x855A`; una seconda con maschera `0x1000` lascia `0x855A`. Il backing finale contiene `0x855A`. Un [audit ripetibile](../Python_Trace_Scripts/s33_audit_liveview_fe8014c.py) controlla hash delle evidenze, seed, percorso e prima trasformazione: [risultato](../outputs/liveview_fe8014c_20261029/audit.json). L'operando del negozio appare sign-extended nella traccia, mentre il backing verificato è a 16 bit.
+
+La prova integrata resta **FAIL**: prosegue fino a una lettura non mappata `0x0FE800AC` nello stesso wrapper, dopo 586.554 istruzioni simulate. [Manifest e traccia](../Risultati/GUI_S33/liveview_return_mask_probe_cpu_20261029T223945Z/verified_evidence.json), [banco](../Python_Trace_Scripts/s33_verify_gui_liveview_return_mask_probe_cpu.py). Il PASS dell'audit certifica solo la traccia parziale, non il ritorno.
+
+Gli ingressi, il contesto, i lock e le celle MMIO sono sintetici; la memoria ordinaria non riproduce eventuali effetti speciali dei registri. Non sono dimostrati tempi, effetti hardware, schermata visibile o ritorno completo. **NON_INSTALLARE**.

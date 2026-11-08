@@ -1,0 +1,7 @@
+# Iride: frammento del calcolo, 31 ottobre 2026
+
+Nel dump V1.1, il pseudo-C Ghidra di `0xF7844` indica un percorso verso l'iride. Le istruzioni originali a `0xF78BE` confrontano il byte desiderato a `0x38068F` con lo stato corrente restituito dal getter che legge `0x367FEA`; se diverso tentano l'acquisizione e poi richiedono la nuova posizione. Il decompilato contiene registri `extraout`: l'interpretazione è stata controllata sulle istruzioni, non trattata come C sorgente certificato.
+
+Il verificatore [s33_verify_iris_claim_async_cpu.py](../Python_Trace_Scripts/s33_verify_iris_claim_async_cpu.py), con `--exposure-fragment`, ha eseguito cinque casi su CPU GNU: 9→1 e 1→9 richiedono la posizione; 9→9 evita acquisizione e richiesta; un errore di acquisizione interrompe il percorso; risorsa occupata non posta la richiesta. [Evidenze](../Risultati/GUI_S33/iris_exposure_fragment_cpu_20261031T155840Z/). Passano anche i controlli esistenti: sette casi acquisizione, due completamento e due errore post.
+
+Il banco entra direttamente nel frammento assumendo le condizioni a monte, usa frame e valori sintetici, sostituisce l'uscita e simula servizi, MMIO e post; non esegue lo scheduler né dimostra il movimento fisico. Non identifica quale modalità imposti il byte desiderato, né dimostra che sia il comando per ritornare all'esposizione automatica. Firmware e candidati restano **NON_INSTALLARE**.

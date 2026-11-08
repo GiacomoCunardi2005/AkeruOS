@@ -1,0 +1,9 @@
+# Scanner, selezione colore e mono per righe — CPU emulata
+
+Il 4 novembre 2026 il banco GNU ARC700 estende la [prova scanner → colore/mono](S33_GUI_Scanner_Menu_Colore_Mono_CPU_20261104.md). Scanner, coda e dispatcher Nikon originali raggiungono un callback sintetico che chiama il modello C; il banco estrae e consegna gli eventi esplicitamente. Dopo ciascuna selezione salva la modalità e chiama `akeru_color_process_rows` per due righe di un frame sintetico 2×2.
+
+**8/8 casi PASS:** due ordini callback, due modalità iniziali e sequenze standard→mono / mono→standard. In modalità standard le due righe restano a sentinella 777; in mono ciascun campione 1024 produce 1219. Dopo la prima chiamata il banco controlla anche che la seconda riga sia ancora a sentinella. Durante il primo frame il banco cambia esplicitamente la modalità corrente usando `akeru_color_select`, ma passa alla seconda riga lo snapshot precedente: entrambe le righe seguono la modalità salvata. La successiva scelta del menu aggiorna nuovamente la modalità. Il frame sorgente resta invariato.
+
+[Evidenze per righe](../Risultati/GUI_S33/key_scanner_menu_color_cpu_20261104T162558120627Z/verified_evidence.json), [regressione a frame intero 8/8](../Risultati/GUI_S33/key_scanner_menu_color_cpu_20261104T162558137330Z/verified_evidence.json). Riproduzione: `python3 Python_Trace_Scripts/s33_verify_key_scanner_color_pipeline_cpu.py --rows`.
+
+Frame, descrittore, callback, tempistiche e ordinamento sono sintetici; il banco copia lo snapshot, cambia la modalità e invoca il processore, non lo fa il percorso di scatto Nikon. Non sono provati sincronizzazione reale, durata o capacità dei buffer, origine Bayer, calibrazione, prestazioni o JPEG; ogni striscia richiede ancora il frame sorgente completo e lo ricontrolla tutto. Nessun hardware o supporto modificato. **NON_INSTALLARE**.

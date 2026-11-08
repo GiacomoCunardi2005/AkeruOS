@@ -1,0 +1,9 @@
+# MEMDUMP: prototipo multiregione con mappa esplicita
+
+Il 7 novembre 2026 è stato aggiunto un [prototipo](../AkeruOS/nikon_v11_memdump_map.c), separato dai firmware esistenti, per chiamare il diagnostico Nikon una volta per ogni intervallo fornito dal chiamante. Non contiene alcuna mappa fisica predefinita: senza una lista non apre file. Verifica intervalli ordinati, non sovrapposti, non vuoti e sotto `0x0FE00000`, senza sostenere che tale controllo dimostri RAM leggibile.
+
+Per ogni intervallo crea esclusivamente `B:\\XXXXXXXX.BIN`, dove `XXXXXXXX` è la base esadecimale. Il file contiene i primi 256 byte richiesti dal diagnostico, seguiti dai byte dell'intervallo; la lunghezza della regione è quindi la dimensione del file meno 256. L'adattatore verifica stato, conteggio e file-error; il ciclo verifica anche la close e si arresta al primo errore. Non cancella né sovrascrive file. Se detach o close lasciano risorse vive, la sessione le conserva e non può essere riavviata come se fossero state liberate.
+
+Il [test host](../AkeruOS/tests/nikon_v11_memdump_map_test.c) passa con ASan/UBSan; [GNU ARC](../Risultati/Runtime_Kernel/MEMDUMP_Map_Adapter/20261107T125552232401Z/verified_evidence.json) passa gli stessi casi con diagnostico, file, attach/detach e I/O come fixture. Copre due regioni sintetiche, nomi, ordine e parametri delle scritture, mappa assente/sovrapposta/MMIO/overflow, file esistente, errore, conteggio corto e close/detach falliti. Non confronta dati RAM reali: la write è una fixture.
+
+Questo codice non è collegato a un task o a un `firmware.bin`, non prova l'esecuzione del diagnostico e del filesystem originali in questa nuova configurazione, e richiede ancora una mappa fisica verificata, gestione del volume e verifica del boot. I file sono acquisizioni sequenziali non atomiche; se un errore lascia un file parziale, il nome esclusivo ne impedisce la sovrascrittura. **NON INSTALLARE.**

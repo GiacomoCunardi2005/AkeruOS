@@ -1,0 +1,11 @@
+# RAW reali: confronto con il marcatore diagnostico V1.1
+
+Il 29 ottobre 2026 ho confrontato offline i dieci `DSCo1003`–`DSCo1012` con la sequenza di 32 bit della tabella originale V1.1 a `0x35231C`. Nel [percorso statico del marcatore](S33_Mono_RAW_Integrita_Buffer_20261027.md), assumendo `r16=0` e lo stesso puntatore base usato dal writer, i byte candidati si trovano a offset `13.263.616 + i × 8.416`, per `i=0..31`.
+
+**Tutti e dieci i file coincidono con la sequenza prevista in 32 posizioni su 32.** La sequenza è `10011001101010101001100110101010`. Per confronto, i byte alla stessa altezza e a 64 scostamenti vicini di 2, 4, …, 128 byte hanno tutti bit basso zero: ciascuna sequenza vicina coincide quindi in 16 posizioni su 32 con la tabella, che contiene 16 zeri e 16 uni. È un forte indizio coerente con l'inserimento del marcatore in quelle posizioni; i controlli vicini non sono prove casuali indipendenti e non permettono di calcolare una probabilità di attribuzione.
+
+Le posizioni iniziano esattamente alla seconda metà del `DSCo`, quindi sono **fuori dal payload del `CFAi` corrispondente**, che coincide con la prima metà. Questa osservazione non rende integro il CFAi né prova che il marcatore sia l'unica modifica. Non conosciamo i bit prima di una possibile scrittura: non si può dire quanti siano stati cambiati né ricostruirli dal file. I file non identificano con certezza la versione firmware o il percorso effettivo; un'altra sorgente potrebbe produrre lo stesso schema. La presenza del CFA fisico e le elaborazioni precedenti restano da caratterizzare.
+
+[Verificatore ripetibile](../Python_Trace_Scripts/s33_compare_real_raw_marker.py); [risultati, controlli e SHA-256 dei 20 file](../outputs/raw_marker_comparison_20261029T052807Z/comparison.json). La tabella V1.1 è confrontata con `DUMPS/MainCode.dmp`; ogni coppia `CFAi`/`DSCo` è confrontata integralmente per la metà comune. I file di input non sono modificati. L'utente riferisce che i RAW sono stati prodotti con l'aggiornamento, ma il loro hash firmware resta non verificato.
+
+Per la GUI, questo rafforza la necessità di non equiparare l'attivazione dei flag diagnostici a un'uscita monocromatica «pura»: l'eventuale scelta colore/mono necessita di una pipeline e di un buffer caratterizzati separatamente. Nessun test su fotocamera, SD o scatto; **NON_INSTALLARE**.

@@ -1,0 +1,9 @@
+# Live view: inizializzazione del contesto 43C4F4
+
+Il 29 ottobre 2026 ho seguito l'accesso che interrompeva il [tentativo di ritorno](S33_GUI_Liveview_Ritorno_Tentativi_CPU_20261029.md). Il getter originale `0x109A28` restituisce `0x43C4F4`; il codice a `0x0DF44E` e `0x0DF45A` legge rispettivamente i byte a offset 74 e 75. Il significato fotografico di questi byte non è identificato.
+
+La routine originale `0x109A88` chiama il getter, azzera 76 byte e poi scrive il primo argomento nel byte a offset 0 e il secondo nel byte a offset 74. In GNU ARC700, **tre casi PASS** su RAM sintetica pre-riempita: `(0,0)`, `(0xA5,0x7F)` e `(0x123,0x1FF)`; le scritture ai campi usano il byte basso, gli altri byte del blocco sono zero e le due guardie immediatamente esterne sono conservate. [Casi e traccia](../Risultati/GUI_S33/liveview_context_initializer_cpu_20261029T223800Z/verified_evidence.json), [banco](../Python_Trace_Scripts/s33_verify_liveview_return_context_initializer_cpu.py), 1.093 istruzioni simulate. Le chiamate sono dirette dal banco: non sappiamo quando e con quali valori la fotocamera invochi questa routine.
+
+Come esperimento separato, ho aggiunto RAM sintetica per il contesto e chiamato `0x109A88(0,0)` prima del ritorno nel banco integrato. La precedente lettura a `0x43C53E` viene superata, ma il tentativo **FAIL** si arresta su lettura MMIO non mappata `0x0FE80158` a `0x20D5F0`, dopo 586.033 istruzioni simulate: [evidenza e traccia](../Risultati/GUI_S33/liveview_return_init_probe_cpu_20261029T223806Z/verified_evidence.json), [banco](../Python_Trace_Scripts/s33_verify_gui_liveview_return_init_probe_cpu.py). I valori zero e l'ordine di inizializzazione sono imposti dal banco; non sono un'ipotesi verificata sul runtime della fotocamera.
+
+Nessun ritorno completo, display, tasto fisico o scatto è dimostrato. RAM e MMIO sono modelli sintetici; il contesto non è una dichiarazione di RAM libera. **NON_INSTALLARE**.

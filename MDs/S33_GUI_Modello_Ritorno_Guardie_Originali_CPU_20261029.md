@@ -1,0 +1,9 @@
+# Richiesta di ritorno del modello e guardie originali
+
+Il 29 ottobre 2026 ho collegato nel banco la [richiesta astratta di ritorno](S33_GUI_Modello_Ritorno_Evento_20261029.md) al [percorso originale CaptureMenu](S33_GUI_CaptureMenu_Ritorno_LiveView_CPU_20261027.md). Il banco passa `0x480` al modello C compilato ARC700; **solo se** riceve `AKERU_RETURN_LIVEVIEW`, chiama esplicitamente il wrapper Nikon originale `0x7CAFE8` con `0x480`. Dispatcher e handler originali portano, quando consentito, alla richiesta `0x1453E4(0x87,0)`, registrata da una fixture.
+
+Dieci casi PASS, 3.297 istruzioni simulate. Nel caso principale senza filtro e con guardie permissive, la fixture registra quattro eventi `0x81`, `0x80`, `0x101`, `0x100`, poi una richiesta all'oggetto `AutoSceneLiveView` ID `0x87`. Nei sette casi principali con filtro o guardie che impediscono il percorso, la richiesta non arriva; in due di essi una chiamata preliminare è già avvenuta. Nei casi esposizione e colore, il modello ritorna alla schermata principale con `REDRAW` e il banco non invoca il wrapper Nikon.
+
+[Casi](../Risultati/GUI_S33/model_back_original_guard_cpu_20261029T224249Z/cases.json), [traccia, hash e risultato](../Risultati/GUI_S33/model_back_original_guard_cpu_20261029T224249Z/verified_evidence.json), [banco](../Python_Trace_Scripts/s33_verify_gui_model_back_original_guard_cpu.py), [fixture](../Risultati/GUI_S33/model_back_original_guard_cpu_20261029T224249Z/fixture_patches.json). Apertura e invio dei quattro eventi sono registratori, non servizi effettivi; filtro, guardie e contesto sono sintetici.
+
+Il collegamento condizionale è implementato **dal banco**, non nel firmware. Una richiesta del modello non garantisce l'apertura e non è necessariamente priva di effetti preliminari quando una guardia la blocca; non assumere che si possa ripetere ciecamente. Non sono verificati scheduler, controlli attivi, tasti fisici, rendering, transizione o scatto. **NON_INSTALLARE**.

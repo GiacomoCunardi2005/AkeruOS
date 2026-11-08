@@ -1,0 +1,11 @@
+# Tempo: riconferma dopo gestore occupato — CPU V1.1, 2026-11-05
+
+Il banco estende il percorso snapshot sintetico → AutoScene e CaptureMenu originali → modello Akeru sintetico → schermata tempo originale, descritto in `S33_GUI_Akeru_Tempo_Ritorno_Contestuale_CPU_20261105.md`. Dopo modifica e prima conferma con guardia occupata, registra valore, campi, descrittore e flag; il banco libera esplicitamente la guardia e inietta una seconda pressione e rilascio `0x580/581` tramite scanner, coda e dispatcher originali. Il trampolino contestuale è solo nella copia emulata.
+
+**4/4 PASS**, direzioni più/meno × UI fixture 0/0x23: dopo la prima conferma il valore è 121/119, i due campi software sono 121000/119000, la finestra tempo `0x989cd8` rimane corrente e il flag sintetico resta 1. Dopo la riconferma il descrittore sintetico Akeru `0x20c0000` diventa corrente, il flag passa a 0 e gli stessi campi restano invariati anche dopo rilascio e navigazione successiva. Stack conservato. La traccia mostra **due esecuzioni** della conferma `0x7d2394` e delle routine `0x0d03e0` e `0x0de7b4`: la stabilità dei due campi non prova assenza di altri effetti ripetuti né idempotenza generale. Controllo con guardia inizialmente libera: PASS, una sola esecuzione delle tre routine.
+
+Riproduzione: `python3 Python_Trace_Scripts/s33_verify_snapshot_capture_focus_original_cpu.py --boot-2c --custom-targets --open-targets --akeru-menu --akeru-time-open --akeru-time-edit --akeru-time-return-context --akeru-time-retry`; aggiungere `--akeru-time-down` e/o `--ui-mode-23`. Controllo: sostituire `--akeru-time-retry` con `--akeru-time-return-free`.
+
+Risultati in `Risultati/GUI_S33/`: `snapshot_capture_focus_original_cpu_20261105T183215197200Z` (più/UI 0), `...183215176426Z` (meno/UI 0), `...183215176037Z` (più/UI 0x23), `...183215205156Z` (meno/UI 0x23); controllo `...183215204763Z`. Ogni directory conserva scenario, traccia, snapshot verificatore, hash e fixture.
+
+La liberazione guardia e la riconferma sono imposte, non automatiche; input, lifecycle, servizi e stato sono in parte sintetici. Non sono provati annullo, concorrenza, tutti gli effetti collaterali, persistenza, rendering, tasti fisici, unità di esposizione o hardware. Nessuna modifica a firmware o installazione GNU. **NON_INSTALLARE**.
